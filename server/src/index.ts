@@ -3,7 +3,7 @@ import Client from "../../lib/client";
 import { ClientMessage, parseServerMessage } from "../../lib/message";
 
 const HOST = "0.0.0.0";
-const PORT = 8090;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8090;
 
 export function startWs() {
     const server = new WebSocket.Server({ host: HOST, port: PORT }, () =>
