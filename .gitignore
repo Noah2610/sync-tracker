@@ -1,0 +1,7 @@
+/node_modules/
+ignore_/
+dist/
+/.next/
+/log
+*.log
+*.err
