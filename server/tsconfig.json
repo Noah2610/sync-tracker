@@ -10,9 +10,10 @@
         "module": "CommonJS",
         "moduleResolution": "node",
         "resolveJsonModule": true,
+        "noImplicitAny": true,
         "outDir": "dist",
         "baseUrl": "."
     },
-    "include": ["./**/*.ts"],
+    "include": ["./src/**/*.ts"],
     "exclude": ["node_modules"]
 }
