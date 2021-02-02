@@ -15,8 +15,9 @@ export type ServerMessage =
               content: string;
           };
       }
-    // TODO
-    | {};
+    | {
+          Undefined: {};
+      };
 
 const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
     z.object({
@@ -26,14 +27,17 @@ const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
         }),
     }),
     // TODO
-    z.object({}),
+    z.object({
+        Undefined: z.object({}),
+    }),
 ]);
 
 /**
  * Attempts to parse the given message string as a server message.
  */
 export function parseServerMessage(raw: any): ServerMessage | null {
-    const result = ServerMessageSchema.safeParse(raw);
+    const json = JSON.parse(raw);
+    const result = ServerMessageSchema.safeParse(json);
     if (result.success) {
         return result.data;
     } else {

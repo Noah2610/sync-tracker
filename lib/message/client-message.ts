@@ -41,7 +41,8 @@ const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
  * Attempts to parse the given message string as a client message.
  */
 export function parseClientMessage(raw: any): ClientMessage | null {
-    const result = ClientMessageSchema.safeParse(raw);
+    const json = JSON.parse(raw);
+    const result = ClientMessageSchema.safeParse(json);
     if (result.success) {
         return result.data;
     } else {

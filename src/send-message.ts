@@ -1,4 +1,4 @@
-import type { ServerMessage } from "../lib/message";
+import { ServerMessage } from "../lib/message";
 
 /**
  * Send the given message to the WS server.
