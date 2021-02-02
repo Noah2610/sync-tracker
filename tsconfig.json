@@ -13,8 +13,19 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "preserve",
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "baseUrl": ".",
+        "paths": {
+            "lib": ["../lib"],
+            "lib/*": ["../lib/*"]
+        }
     },
-    "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx"],
-    "exclude": ["node_modules", "server"]
+    "include": [
+        "./next-env.d.ts",
+        "./src/**/*.ts",
+        "./src/**/*.tsx",
+        "./lib/**/*.ts",
+        "./lib/**/*.tsx"
+    ],
+    "exclude": ["node_modules", "./server"]
 }

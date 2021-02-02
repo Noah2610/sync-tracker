@@ -7,7 +7,7 @@
         "dev": "next dev --port 8080",
         "build": "next build",
         "start": "next start",
-        "dev:server": "nodemon -w server/ -e ts -x yarn run start:server",
+        "dev:server": "nodemon -w server/ -w server/tsconfig.json -e ts,json -x '( yarn run start:server || false )'",
         "build:server": "cd server && tsc",
         "start:server": "yarn run build:server && cd server && node dist/index.js"
     },

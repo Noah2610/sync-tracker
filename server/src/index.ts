@@ -1,6 +1,6 @@
 import WebSocket from "ws";
-import Client from "./client";
-import { ClientMessage } from "./message";
+import Client from "lib/client";
+import { ClientMessage } from "lib/message";
 
 const HOST = "0.0.0.0";
 const PORT = 8090;
@@ -12,15 +12,27 @@ const server = new WebSocket.Server({ host: HOST, port: PORT }, () =>
 const clients: Client[] = [];
 
 function newClient(ws: WebSocket): Client {
-    const id =
-        clients.reduce((largest, client) => Math.max(largest, client.id), 0) +
-        1;
+    const id = Math.max(...clients.map((c) => c.id), 0) + 1;
+    console.log(id);
     const client = {
         id,
         ws,
     };
     clients.push(client);
     return client;
+}
+
+function removeClient(client: Client) {
+    let idx: number | null = null;
+    for (let i = 0; i < clients.length; i++) {
+        if (clients[i].id === client.id) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx) {
+        clients.splice(idx, 1);
+    }
 }
 
 function sendToClient(client: Client, message: ClientMessage) {
@@ -43,5 +55,8 @@ server.on("connection", (ws) => {
                 reason && " " + reason
             }).`,
         );
+        removeClient(client);
     });
 });
+
+setInterval(() => console.log(`client count: ${clients.length}`), 1000);

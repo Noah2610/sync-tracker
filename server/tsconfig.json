@@ -12,8 +12,12 @@
         "resolveJsonModule": true,
         "noImplicitAny": true,
         "outDir": "dist",
-        "baseUrl": "."
+        "baseUrl": ".",
+        "paths": {
+            "lib": ["../lib"],
+            "lib/*": ["../lib/*"]
+        }
     },
-    "include": ["./src/**/*.ts"],
+    "include": ["./src/**/*.ts", "../lib/**/*.ts"],
     "exclude": ["node_modules"]
 }
