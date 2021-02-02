@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import sendMessage from "../send-message";
 
 const WS_PORT = 8090;
 
 export default function Home() {
+    const [ws, setWs] = useState<WebSocket | null>(null);
+
     useEffect(() => {
         const ws = new WebSocket(`ws://${location.hostname}:${WS_PORT}`);
 
@@ -13,8 +16,27 @@ export default function Home() {
             }
         });
 
+        setWs(ws);
+
         return () => ws.close();
     }, []);
 
-    return <>Hello World!</>;
+    return (
+        <>
+            {ws && (
+                <button
+                    onClick={() =>
+                        sendMessage(ws, {
+                            Message: {
+                                userId: 0,
+                                content: "hello",
+                            },
+                        })
+                    }
+                >
+                    Click me!
+                </button>
+            )}
+        </>
+    );
 }

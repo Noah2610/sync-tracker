@@ -1,4 +1,4 @@
-import z from "zod";
+import * as z from "zod";
 
 /**
  * Message for the server.
@@ -32,7 +32,7 @@ const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
 /**
  * Attempts to parse the given message string as a server message.
  */
-export function parseServerMessage(raw: string): ServerMessage | null {
+export function parseServerMessage(raw: any): ServerMessage | null {
     const result = ServerMessageSchema.safeParse(raw);
     if (result.success) {
         return result.data;

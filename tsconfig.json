@@ -15,11 +15,7 @@
         "jsx": "preserve",
         "noImplicitAny": true,
         "strictNullChecks": true,
-        "baseUrl": ".",
-        "paths": {
-            "lib": ["../lib"],
-            "lib/*": ["../lib/*"]
-        }
+        "baseUrl": "."
     },
     "include": [
         "./next-env.d.ts",

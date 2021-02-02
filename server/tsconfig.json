@@ -13,12 +13,8 @@
         "noImplicitAny": true,
         "strictNullChecks": true,
         "outDir": "dist",
-        "baseUrl": ".",
-        "paths": {
-            "lib": ["../lib"],
-            "lib/*": ["../lib/*"]
-        }
+        "baseUrl": "."
     },
-    "include": ["./src/**/*.ts", "../lib/**/*.ts"],
+    "include": ["./index.ts", "./src/**/*.ts", "../lib/**/*.ts"],
     "exclude": ["node_modules"]
 }
