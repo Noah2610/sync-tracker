@@ -5,35 +5,33 @@ import * as z from "zod";
  * Sent from the server to a client.
  */
 export type ClientMessage =
+    /**
+     * Connected.
+     * Notifies that the client has successfully connected.
+     */
     | {
-          /**
-           * Notifies that the client has successfully connected.
-           */
-          Connected: {
-              id: number;
-          };
+          kind: "Connected";
+          id: number;
       }
+    /**
+     * Message.
+     * A chat message.
+     */
     | {
-          /**
-           * A chat message.
-           */
-          Message: {
-              userId: number;
-              content: string;
-          };
+          kind: "Message";
+          userId: number;
+          content: string;
       };
 
 const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
     z.object({
-        Connected: z.object({
-            id: z.number(),
-        }),
+        kind: z.literal("Connected"),
+        id: z.number(),
     }),
     z.object({
-        Message: z.object({
-            userId: z.number(),
-            content: z.string(),
-        }),
+        kind: z.literal("Message"),
+        userId: z.number(),
+        content: z.string(),
     }),
 ]);
 

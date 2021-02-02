@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { parseClientMessage } from "../../lib/message";
 import sendMessage from "../send-message";
 
 const WS_PORT = 8090;
@@ -11,8 +12,21 @@ export default function Home() {
 
         ws.addEventListener("message", (event) => {
             if (event.data) {
-                const message = JSON.parse(event.data);
-                console.log(message);
+                const message = parseClientMessage(event.data);
+                if (message) {
+                    switch (message.kind) {
+                        case "Connected": {
+                            console.log(`Connected as user ${message.id}`);
+                            break;
+                        }
+                        case "Message": {
+                            console.log(
+                                `<${message.userId}> ${message.content}`,
+                            );
+                            break;
+                        }
+                    }
+                }
             }
         });
 
@@ -27,10 +41,9 @@ export default function Home() {
                 <button
                     onClick={() =>
                         sendMessage(ws, {
-                            Message: {
-                                userId: 0,
-                                content: "hello",
-                            },
+                            kind: "Message",
+                            userId: 0,
+                            content: "hello",
                         })
                     }
                 >

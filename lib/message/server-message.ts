@@ -7,28 +7,27 @@ import * as z from "zod";
 export type ServerMessage =
     | {
           /**
+           * Message.
            * A message sent from a client.
            * Server should distribute it among all connected clients.
            */
-          Message: {
-              userId: number;
-              content: string;
-          };
+          kind: "Message";
+          userId: number;
+          content: string;
       }
     | {
-          Undefined: {};
+          kind: "Undefined";
       };
 
 const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
     z.object({
-        Message: z.object({
-            userId: z.number(),
-            content: z.string(),
-        }),
+        kind: z.literal("Message"),
+        userId: z.number(),
+        content: z.string(),
     }),
     // TODO
     z.object({
-        Undefined: z.object({}),
+        kind: z.literal("Undefined"),
     }),
 ]);
 

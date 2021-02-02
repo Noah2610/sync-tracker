@@ -47,7 +47,8 @@ export function startWs() {
         console.log(`Client ${client.id} connected.`);
 
         sendToClient(client, {
-            Connected: { id: client.id },
+            kind: "Connected",
+            id: client.id,
         });
 
         client.ws.on("close", (code, reason) => {
@@ -61,7 +62,7 @@ export function startWs() {
 
         client.ws.on("message", (data) => {
             const message = parseServerMessage(data);
-            console.log("MESSAGE FROM CLIENT: ", JSON.stringify(data));
+            console.log("MESSAGE FROM CLIENT: ", message);
         });
     });
 
