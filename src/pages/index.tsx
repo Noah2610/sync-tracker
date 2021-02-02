@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { parseClientMessage } from "../../lib/message";
 import sendMessage from "../send-message";
 
-const WS_PORT = 8090;
+// const WS_PORT = 8090;
 
 export default function Home() {
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket(`ws://${location.hostname}:${WS_PORT}`);
+        // const ws = new WebSocket(`ws://${location.hostname}:${WS_PORT}`);
+        const ws = new WebSocket("ws://sync-tracker-ws.herokuapp.com");
 
         ws.addEventListener("message", (event) => {
             if (event.data) {
