@@ -62,6 +62,23 @@ export function startWs() {
 
         client.ws.on("message", (data) => {
             const message = parseServerMessage(data);
+            if (message) {
+                switch (message.kind) {
+                    case "Message": {
+                        for (const other of clients) {
+                            sendToClient(other, {
+                                kind: "Message",
+                                userId: client.id,
+                                content: message.content,
+                            });
+                        }
+                        break;
+                    }
+                    default: {
+                        console.error("Unknown ServerMessage", message);
+                    }
+                }
+            }
             console.log("MESSAGE FROM CLIENT: ", message);
         });
     });

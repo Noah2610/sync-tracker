@@ -12,7 +12,6 @@ export type ServerMessage =
            * Server should distribute it among all connected clients.
            */
           kind: "Message";
-          userId: number;
           content: string;
       }
     | {
@@ -22,7 +21,6 @@ export type ServerMessage =
 const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
     z.object({
         kind: z.literal("Message"),
-        userId: z.number(),
         content: z.string(),
     }),
     // TODO

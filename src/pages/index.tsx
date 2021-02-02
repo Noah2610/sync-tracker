@@ -25,6 +25,9 @@ export default function Home() {
                             );
                             break;
                         }
+                        default: {
+                            console.error("Unknown ClientMessage", message);
+                        }
                     }
                 }
             }
@@ -42,7 +45,6 @@ export default function Home() {
                     onClick={() =>
                         sendMessage(ws, {
                             kind: "Message",
-                            userId: 0,
                             content: "hello",
                         })
                     }
