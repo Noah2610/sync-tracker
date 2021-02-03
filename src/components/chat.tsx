@@ -25,10 +25,6 @@ export default function Chat() {
         }
     }, [ws]);
 
-    if (!ws) {
-        return <>No WsSocket connection.</>;
-    }
-
     return (
         <>
             {clientId && (
@@ -40,7 +36,7 @@ export default function Chat() {
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    if (messageContentRef.current) {
+                    if (ws && messageContentRef.current) {
                         ws.sendMessage({
                             kind: "Message",
                             content: messageContentRef.current,
@@ -59,7 +55,11 @@ export default function Chat() {
                     />
                 </div>
                 <div>
-                    <input type="submit" value="Send Message" />
+                    <input
+                        type="submit"
+                        value="Send Message"
+                        disabled={clientId === null}
+                    />
                 </div>
             </form>
 
