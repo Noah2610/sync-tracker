@@ -14,7 +14,6 @@ export function startWs() {
 
     function newClient(ws: WebSocket): Client {
         const id = Math.max(...clients.map((c) => c.id), 0) + 1;
-        console.log(id);
         const client = {
             id,
             ws,
@@ -79,9 +78,6 @@ export function startWs() {
                     }
                 }
             }
-            console.log("MESSAGE FROM CLIENT: ", message);
         });
     });
-
-    setInterval(() => console.log(`client count: ${clients.length}`), 1000);
 }

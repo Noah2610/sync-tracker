@@ -21,7 +21,8 @@ export default function Home() {
         let ws: WebSocket | null = null;
 
         try {
-            ws = new WebSocket("wss://sync-tracker-ws.herokuapp.com");
+            // ws = new WebSocket("wss://sync-tracker-ws.herokuapp.com");
+            ws = new WebSocket("ws://0.0.0.0:8090");
         } catch (e) {
             console.error(e);
         }
