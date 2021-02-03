@@ -1,5 +1,5 @@
 /node_modules/
-ignore_/
+_ignore/
 dist/
 /.next/
 /log
