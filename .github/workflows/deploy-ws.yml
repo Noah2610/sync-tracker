@@ -1,0 +1,27 @@
+name: deploy-ws
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-ws:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+      - run: yarn install
+      - run: yarn run build:server
+      - run: |
+          mkdir dist-ws
+          mv server/dist/* dist-ws/
+          mv server/package.dist-ws.json dist-ws/
+          echo "web: npm run start" > dist-ws/Procfile
+      - uses: onekiloparsec/heroku-node-deploy-subfolder@v1.1.0
+        with:
+          api_key: ${{ secrets.HEROKU_API_KEY }}
+          email: ${{ secrets.HEROKU_EMAIL }}
+          app_name: sync-tracker-ws
+          heroku_branch: master
+          subfolder: dist-ws
