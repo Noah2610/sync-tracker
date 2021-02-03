@@ -19,6 +19,8 @@ jobs:
           cp server/package.dist-ws.json dist/package.json
           cp yarn.lock dist/
           echo "web: yarn run start" > dist/Procfile
+          git config user.email "${{ secrets.HEROKU_EMAIL }}"
+          git config user.name "ws-deployer"
           git add dist --force
           git commit -m "Setup dist/ directory for WS deploy on Heroku"
       - uses: onekiloparsec/heroku-node-deploy-subfolder@v1.1.0
