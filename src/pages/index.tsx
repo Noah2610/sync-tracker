@@ -9,7 +9,7 @@ export default function Home() {
 
     useEffect(() => {
         // const ws = new WebSocket(`ws://${location.hostname}:${WS_PORT}`);
-        const ws = new WebSocket("ws://sync-tracker-ws.herokuapp.com");
+        const ws = new WebSocket("wss://sync-tracker-ws.herokuapp.com");
 
         ws.addEventListener("message", (event) => {
             if (event.data) {
