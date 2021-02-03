@@ -19,7 +19,7 @@ export type ClientMessage =
      */
     | {
           kind: "Message";
-          userId: number;
+          clientId: number;
           content: string;
       };
 
@@ -30,7 +30,7 @@ const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
     }),
     z.object({
         kind: z.literal("Message"),
-        userId: z.number(),
+        clientId: z.number(),
         content: z.string(),
     }),
 ]);

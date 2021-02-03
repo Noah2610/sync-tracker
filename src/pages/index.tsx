@@ -42,7 +42,7 @@ export default function Home() {
                             break;
                         }
                         case "Message": {
-                            addMessage(message.userId, message.content);
+                            addMessage(message.clientId, message.content);
                             break;
                         }
                         default: {

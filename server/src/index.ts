@@ -67,7 +67,7 @@ export function startWs() {
                         for (const other of clients) {
                             sendToClient(other, {
                                 kind: "Message",
-                                userId: client.id,
+                                clientId: client.id,
                                 content: message.content,
                             });
                         }
