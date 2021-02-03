@@ -24,6 +24,7 @@ export default class WsMessageEmitter {
         this.events = {
             Connected: [],
             Message: [],
+            UpdateClient: [],
         };
 
         this.setupWsListener();

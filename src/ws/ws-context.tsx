@@ -8,7 +8,7 @@ export function useWs(): WsState | null {
 }
 
 export interface WsProviderProps {
-    children: React.ReactChild | React.ReactChildren;
+    children: React.ReactNode;
 }
 
 export function WsProvider({ children }: WsProviderProps) {

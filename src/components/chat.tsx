@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import Client from "../../lib/client";
 import { useWs } from "../ws/ws-context";
 
 export default function Chat() {
@@ -6,21 +7,20 @@ export default function Chat() {
     const [clientId, setClientId] = useState<number | null>(null);
     const [messages, setMessages] = useState<
         {
-            clientId: number;
+            client: Client;
             content: string;
         }[]
     >([]);
 
     const messageContentRef = useRef("");
 
-    const addMessage = (clientId: number, content: string) =>
-        setMessages((prev) => [...prev, { clientId, content }]);
+    const addMessage = (client: Client, content: string) =>
+        setMessages((prev) => [...prev, { client, content }]);
 
     useEffect(() => {
         if (ws) {
-            ws.messages.on("Connected", (message) => setClientId(message.id));
             ws.messages.on("Message", (message) =>
-                addMessage(message.clientId, message.content),
+                addMessage(message.client, message.content),
             );
         }
     }, [ws]);
@@ -66,7 +66,9 @@ export default function Chat() {
             <div>
                 {messages.map((message, i) => (
                     <div key={i}>
-                        <strong>&lt;{message.clientId}&gt;</strong>{" "}
+                        <strong>
+                            &lt;{message.client.name || message.client.id}&gt;
+                        </strong>{" "}
                         <span>{message.content}</span>
                     </div>
                 ))}

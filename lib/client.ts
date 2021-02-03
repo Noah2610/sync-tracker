@@ -1,6 +1,11 @@
-import WebSocket from "ws";
+import * as z from "zod";
 
 export default interface Client {
     id: number;
-    ws: WebSocket;
+    name?: string;
 }
+
+export const ClientSchema: z.ZodSchema<Client> = z.object({
+    id: z.number(),
+    name: z.string().optional(),
+});

@@ -1,4 +1,5 @@
 import * as z from "zod";
+import Client, { ClientSchema } from "../client";
 
 /**
  * Message for a client.
@@ -11,7 +12,16 @@ export type ClientMessage =
      */
     | {
           kind: "Connected";
-          id: number;
+          client: Client;
+      }
+    /**
+     * UpdateClient.
+     * Is sent when any client data changes.
+     * Like when a client connects, disconnects, changes their name, etc.
+     */
+    | {
+          kind: "UpdateClient";
+          client: Client;
       }
     /**
      * Message.
@@ -19,18 +29,18 @@ export type ClientMessage =
      */
     | {
           kind: "Message";
-          clientId: number;
+          client: Client;
           content: string;
       };
 
 const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
     z.object({
         kind: z.literal("Connected"),
-        id: z.number(),
+        client: ClientSchema,
     }),
     z.object({
         kind: z.literal("Message"),
-        clientId: z.number(),
+        client: ClientSchema,
         content: z.string(),
     }),
 ]);

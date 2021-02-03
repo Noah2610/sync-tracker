@@ -1,6 +1,6 @@
 import WebSocket from "ws";
-import Client from "../../lib/client";
 import { ClientMessage, parseServerMessage } from "../../lib/message";
+import ClientConnection from "./client-connection";
 
 const HOST = "0.0.0.0";
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8090;
@@ -10,32 +10,35 @@ export function startWs() {
         console.log(`WebSocket running on ws://${HOST}:${PORT}`),
     );
 
-    const clients: Client[] = [];
+    const connections: ClientConnection[] = [];
 
-    function newClient(ws: WebSocket): Client {
-        const id = Math.max(...clients.map((c) => c.id), 0) + 1;
+    function newClient(ws: WebSocket): ClientConnection {
+        const id = Math.max(...connections.map((c) => c.client.id), 0) + 1;
         const client = {
-            id,
+            client: {
+                id,
+                name: `Client ${id}`,
+            },
             ws,
         };
-        clients.push(client);
+        connections.push(client);
         return client;
     }
 
-    function removeClient(client: Client) {
+    function removeClient(client: ClientConnection) {
         let idx: number | null = null;
-        for (let i = 0; i < clients.length; i++) {
-            if (clients[i].id === client.id) {
+        for (let i = 0; i < connections.length; i++) {
+            if (connections[i].client.id === client.client.id) {
                 idx = i;
                 break;
             }
         }
         if (idx !== null) {
-            clients.splice(idx, 1);
+            connections.splice(idx, 1);
         }
     }
 
-    function sendToClient(client: Client, message: ClientMessage) {
+    function sendToClient(client: ClientConnection, message: ClientMessage) {
         const messageRaw = JSON.stringify(message);
         client.ws.send(messageRaw);
     }
@@ -43,16 +46,16 @@ export function startWs() {
     server.on("connection", (ws) => {
         const client = newClient(ws);
 
-        console.log(`Client ${client.id} connected.`);
+        console.log(`Client ${client.client.id} connected.`);
 
         sendToClient(client, {
             kind: "Connected",
-            id: client.id,
+            client: client.client,
         });
 
         client.ws.on("close", (code, reason) => {
             console.log(
-                `Client ${client.id} disconnected (${code}${
+                `Client ${client.client.id} disconnected (${code}${
                     reason && " " + reason
                 }).`,
             );
@@ -64,10 +67,10 @@ export function startWs() {
             if (message) {
                 switch (message.kind) {
                     case "Message": {
-                        for (const other of clients) {
+                        for (const other of connections) {
                             sendToClient(other, {
                                 kind: "Message",
-                                clientId: client.id,
+                                client: client.client,
                                 content: message.content,
                             });
                         }
