@@ -1,6 +1,5 @@
 import WsMessageEmitter from "./ws-message-emitter";
 import { ServerMessage } from "../../lib/message";
-import sendMessage from "../send-message";
 
 const WS_URL =
     process.env.WS_URL || process.env.NEXT_PUBLIC_WS_URL || "ws://0.0.0.0:8090";
@@ -33,8 +32,8 @@ export function createWsState(): WsState {
 
     const state = {
         ws,
-        sendMessage: function (message: ServerMessage) {
-            sendMessage(this.ws, message);
+        sendMessage(message: ServerMessage) {
+            ws.send(JSON.stringify(message));
         },
         messages: new WsMessageEmitter(ws),
     };
