@@ -1,7 +1,8 @@
 /node_modules/
+/.next/
+/.vercel/
 _ignore/
 dist/
-/.next/
 /log
 *.log
 *.err
