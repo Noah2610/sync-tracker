@@ -16,7 +16,7 @@ jobs:
       - run: |
           mkdir dist
           cp -r server/dist/* dist/
-          cp server/package.dist.json dist/package.json
+          cp server/package.dist-ws.json dist/package.json
           cp yarn.lock dist/
           echo "web: yarn run start" > dist/Procfile
           git add dist --force
