@@ -1,12 +1,14 @@
 import type { AppProps } from "next/app";
-// import { WsProvider, createWsState } from "../ws-context";
+import { WsProvider } from "../ws/ws-context";
 
 import "../styles/global.css";
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
         <>
-            <Component {...pageProps} />
+            <WsProvider>
+                <Component {...pageProps} />
+            </WsProvider>
         </>
     );
 }
