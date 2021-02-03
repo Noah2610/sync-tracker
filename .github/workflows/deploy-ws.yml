@@ -14,14 +14,17 @@ jobs:
       - run: yarn install
       - run: yarn run build:server
       - run: |
-          mkdir dist-ws
-          mv server/dist/* dist-ws/
-          mv server/package.dist-ws.json dist-ws/
-          echo "web: npm run start" > dist-ws/Procfile
+          mkdir dist
+          cp -r server/dist/* dist/
+          cp server/package.dist.json dist/package.json
+          cp yarn.lock dist/
+          echo "web: yarn run start" > dist/Procfile
+          git add dist --force
+          git commit -m "Setup dist/ directory for WS deploy on Heroku"
       - uses: onekiloparsec/heroku-node-deploy-subfolder@v1.1.0
         with:
           api_key: ${{ secrets.HEROKU_API_KEY }}
           email: ${{ secrets.HEROKU_EMAIL }}
           app_name: sync-tracker-ws
           heroku_branch: master
-          subfolder: dist-ws
+          subfolder: dist
