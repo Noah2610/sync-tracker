@@ -2,6 +2,9 @@ import WsMessageEmitter from "./ws-message-emitter";
 import { ServerMessage } from "../../lib/message";
 import sendMessage from "../send-message";
 
+const WS_URL =
+    process.env.WS_URL || process.env.NEXT_PUBLIC_WS_URL || "ws://0.0.0.0:8090";
+
 export default interface WsState {
     ws: WebSocket;
     sendMessage(message: ServerMessage): void;
@@ -12,7 +15,7 @@ function createWs(): WebSocket | null {
     let ws: WebSocket | null = null;
 
     try {
-        ws = new WebSocket("wss://sync-tracker-ws.herokuapp.com");
+        ws = new WebSocket(WS_URL);
     } catch (e) {
         console.error(e);
         return null;
