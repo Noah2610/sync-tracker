@@ -31,7 +31,7 @@ export function startWs() {
                 break;
             }
         }
-        if (idx) {
+        if (idx !== null) {
             clients.splice(idx, 1);
         }
     }
