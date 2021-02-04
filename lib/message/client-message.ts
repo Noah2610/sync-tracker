@@ -43,6 +43,10 @@ const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
         client: ClientSchema,
         content: z.string(),
     }),
+    z.object({
+        kind: z.literal("UpdateClient"),
+        client: ClientSchema,
+    }),
 ]);
 
 /**

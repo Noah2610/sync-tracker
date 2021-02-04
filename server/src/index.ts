@@ -26,6 +26,19 @@ export function startWs(state: State) {
             client: client.client,
         });
 
+        state.connections.forEach((conn) => {
+            // Inform new client of all existing connections.
+            sendMessage(client, {
+                kind: "UpdateClient",
+                client: conn.client,
+            });
+            // Inform all existing connections of new client.
+            sendMessage(conn, {
+                kind: "UpdateClient",
+                client: client.client,
+            });
+        });
+
         client.ws.on("close", (code, reason) => {
             console.log(
                 `Client ${client.client.id} disconnected (${code}${
@@ -40,15 +53,27 @@ export function startWs(state: State) {
             if (message) {
                 switch (message.kind) {
                     case "Message": {
-                        for (const other of state.connections) {
-                            sendMessage(other, {
+                        state.connections.forEach((conn) =>
+                            sendMessage(conn, {
                                 kind: "Message",
                                 client: client.client,
                                 content: message.content,
-                            });
-                        }
+                            }),
+                        );
                         break;
                     }
+
+                    case "UpdateClientName": {
+                        client.client.name = message.name;
+                        state.connections.forEach((conn) =>
+                            sendMessage(conn, {
+                                kind: "UpdateClient",
+                                client: client.client,
+                            }),
+                        );
+                        break;
+                    }
+
                     default: {
                         console.error("Unknown ServerMessage", message);
                     }

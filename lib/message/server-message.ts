@@ -5,17 +5,22 @@ import * as z from "zod";
  * Sent from a client to the server.
  */
 export type ServerMessage =
+    /**
+     * Message.
+     * A message sent from a client.
+     * Server should distribute it among all connected clients.
+     */
     | {
-          /**
-           * Message.
-           * A message sent from a client.
-           * Server should distribute it among all connected clients.
-           */
           kind: "Message";
           content: string;
       }
+    /**
+     * UpdateClientName.
+     * Change the connected client's displayed name.
+     */
     | {
-          kind: "Undefined";
+          kind: "UpdateClientName";
+          name: string;
       };
 
 const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
@@ -23,9 +28,9 @@ const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
         kind: z.literal("Message"),
         content: z.string(),
     }),
-    // TODO
     z.object({
-        kind: z.literal("Undefined"),
+        kind: z.literal("UpdateClientName"),
+        name: z.string(),
     }),
 ]);
 

@@ -63,29 +63,58 @@ function setupCoreListeners(
     });
 
     state.messages.on("UpdateClient", (message) => {
-        let existingClientIdx: number | null = null;
-        for (let idx = 0; idx < state.connectedClients.length; idx++) {
-            if (state.connectedClients[idx].id === message.client.id) {
-                existingClientIdx = idx;
-                break;
+        update((prev) => {
+            const connectedClients: Client[] = [];
+            let didExist = false;
+
+            for (const conn of prev.connectedClients) {
+                if (conn.id === message.client.id) {
+                    connectedClients.push(message.client);
+                    didExist = true;
+                } else {
+                    connectedClients.push(conn);
+                }
             }
-        }
-        if (existingClientIdx === null) {
-            update((prev) => ({
+
+            if (!didExist) {
+                connectedClients.push(message.client);
+            }
+
+            let client = prev.client;
+            if (client && client.id === message.client.id) {
+                client = message.client;
+            }
+
+            return {
                 ...prev,
-                connectedClients: [...prev.connectedClients, message.client],
-            }));
-        } else {
-            update((prev) => {
-                const connectedClients = prev.connectedClients;
-                connectedClients[existingClientIdx as number] = {
-                    ...message.client,
-                };
-                return {
-                    ...prev,
-                    connectedClients,
-                };
-            });
-        }
+                client,
+                connectedClients,
+            };
+        });
+
+        //         let existingClientIdx: number | null = null;
+        //         for (let idx = 0; idx < state.connectedClients.length; idx++) {
+        //             if (state.connectedClients[idx].id === message.client.id) {
+        //                 existingClientIdx = idx;
+        //                 break;
+        //             }
+        //         }
+        //         if (existingClientIdx === null) {
+        //             update((prev) => ({
+        //                 ...prev,
+        //                 connectedClients: [...prev.connectedClients, message.client],
+        //             }));
+        //         } else {
+        //             update((prev) => {
+        //                 const connectedClients = [...prev.connectedClients];
+        //                 connectedClients[existingClientIdx as number] = {
+        //                     ...message.client,
+        //                 };
+        //                 return {
+        //                     ...prev,
+        //                     connectedClients,
+        //                 };
+        //             });
+        //         }
     });
 }
