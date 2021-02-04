@@ -9,15 +9,34 @@ export default interface ClientConnection {
 
 /**
  * Create a new `ClientConnection` with the given WebSocket.
+ * Adds the new client to the state.
  */
-export function newClientConnection(
+export function addClientConnection(
     state: State,
     ws: WebSocket,
 ): ClientConnection {
-    return {
+    const conn = {
         client: newClient(state),
         ws,
     };
+    state.connections.push(conn);
+    return conn;
+}
+
+/**
+ * Removes the stored `ClientConnection` with the given client ID.
+ */
+export function removeClientConnection(state: State, clientId: number) {
+    let idx: number | null = null;
+    for (let i = 0; i < state.connections.length; i++) {
+        if (state.connections[i].client.id === clientId) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx !== null) {
+        state.connections.splice(idx, 1);
+    }
 }
 
 function newClient(state: State): Client {

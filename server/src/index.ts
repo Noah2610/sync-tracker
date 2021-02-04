@@ -11,44 +11,17 @@ export function startWs(state: State) {
         console.log(`WebSocket running on ws://${HOST}:${PORT}`),
     );
 
-    function newClient(ws: WebSocket): ClientConnection {
-        const id =
-            Math.max(...state.connections.map((c) => c.client.id), 0) + 1;
-        const client = {
-            client: {
-                id,
-                name: `Client ${id}`,
-            },
-            ws,
-        };
-        state.connections.push(client);
-        return client;
-    }
-
-    function removeClient(client: ClientConnection) {
-        let idx: number | null = null;
-        for (let i = 0; i < state.connections.length; i++) {
-            if (state.connections[i].client.id === client.client.id) {
-                idx = i;
-                break;
-            }
-        }
-        if (idx !== null) {
-            state.connections.splice(idx, 1);
-        }
-    }
-
-    function sendToClient(client: ClientConnection, message: ClientMessage) {
+    function sendMessage(client: ClientConnection, message: ClientMessage) {
         const messageRaw = JSON.stringify(message);
         client.ws.send(messageRaw);
     }
 
     server.on("connection", (ws) => {
-        const client = newClient(ws);
+        const client = state.addClientConnection(ws);
 
         console.log(`Client ${client.client.id} connected.`);
 
-        sendToClient(client, {
+        sendMessage(client, {
             kind: "Connected",
             client: client.client,
         });
@@ -59,7 +32,7 @@ export function startWs(state: State) {
                     reason && " " + reason
                 }).`,
             );
-            removeClient(client);
+            state.removeClientConnection(client.client.id);
         });
 
         client.ws.on("message", (data) => {
@@ -68,7 +41,7 @@ export function startWs(state: State) {
                 switch (message.kind) {
                     case "Message": {
                         for (const other of state.connections) {
-                            sendToClient(other, {
+                            sendMessage(other, {
                                 kind: "Message",
                                 client: client.client,
                                 content: message.content,
