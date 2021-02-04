@@ -4,7 +4,6 @@ import { useWs } from "../ws/ws-context";
 
 export default function Chat() {
     const ws = useWs();
-    const [clientId, setClientId] = useState<number | null>(null);
     const [messages, setMessages] = useState<
         {
             client: Client;
@@ -19,17 +18,25 @@ export default function Chat() {
 
     useEffect(() => {
         if (ws) {
-            ws.messages.on("Message", (message) =>
-                addMessage(message.client, message.content),
-            );
+            ws.messages.on("Message", (message) => {
+                addMessage(message.client, message.content);
+            });
         }
-    }, [ws]);
+    }, []);
 
     return (
         <>
-            {clientId && (
+            {ws && ws.client && (
                 <div>
-                    Your client ID: <strong>{clientId}</strong>
+                    {ws.client.name ? (
+                        <>
+                            Your client Name: <strong>{ws.client.name}</strong>
+                        </>
+                    ) : (
+                        <>
+                            Your client ID<strong>{ws.client.id}</strong>
+                        </>
+                    )}
                 </div>
             )}
 
@@ -55,11 +62,7 @@ export default function Chat() {
                     />
                 </div>
                 <div>
-                    <input
-                        type="submit"
-                        value="Send Message"
-                        disabled={clientId === null}
-                    />
+                    <input type="submit" value="Send Message" disabled={!ws} />
                 </div>
             </form>
 

@@ -15,15 +15,6 @@ export type ClientMessage =
           client: Client;
       }
     /**
-     * UpdateClient.
-     * Is sent when any client data changes.
-     * Like when a client connects, disconnects, changes their name, etc.
-     */
-    | {
-          kind: "UpdateClient";
-          client: Client;
-      }
-    /**
      * Message.
      * A chat message.
      */
@@ -31,6 +22,15 @@ export type ClientMessage =
           kind: "Message";
           client: Client;
           content: string;
+      }
+    /**
+     * UpdateClient.
+     * Is sent when any client data changes.
+     * Like when a client connects, disconnects, changes their name, etc.
+     */
+    | {
+          kind: "UpdateClient";
+          client: Client;
       };
 
 const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
