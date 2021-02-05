@@ -2,30 +2,19 @@ import {
     createStyles,
     makeStyles,
     AppBar,
-    Box,
     Button,
     Toolbar,
-    Typography,
 } from "@material-ui/core";
+import { useState } from "react";
 import { useWs } from "../../ws/ws-context";
+import ClientName from "../client-name";
+import ClientChangeNameDialog from "../client-change-name-dialog";
+import Loading from "../loading";
 
 const useStyles = makeStyles((theme) =>
     createStyles({
         toolbar: {
             justifyContent: "flex-end",
-        },
-        nameLabel: {
-            display: "block",
-            fontSize: 12,
-            textDecoration: "underline",
-            textAlign: "right",
-        },
-        name: {
-            display: "block",
-            fontSize: 14,
-            letterSpacing: 2,
-            textAlign: "right",
-            fontWeight: "bold",
         },
     }),
 );
@@ -33,21 +22,27 @@ const useStyles = makeStyles((theme) =>
 export default function Navigation() {
     const ws = useWs();
     const styles = useStyles();
+    const [isClientMenuOpen, setClientMenuOpen] = useState(false);
+    const toggleClientMenu = () => setClientMenuOpen((prev) => !prev);
 
     return (
-        <AppBar position="relative">
-            <Toolbar className={styles.toolbar}>
-                <Button variant="text">
-                    <Box>
-                        <Typography className={styles.nameLabel}>
-                            Name
-                        </Typography>
-                        <Typography className={styles.name}>
-                            {ws?.client?.name || "..."}
-                        </Typography>
-                    </Box>
-                </Button>
-            </Toolbar>
-        </AppBar>
+        <>
+            <AppBar position="relative">
+                <Toolbar className={styles.toolbar}>
+                    {ws && ws.client ? (
+                        <Button variant="text" onClick={toggleClientMenu}>
+                            <ClientName client={ws.client} />
+                        </Button>
+                    ) : (
+                        <Loading />
+                    )}
+                </Toolbar>
+            </AppBar>
+
+            <ClientChangeNameDialog
+                open={isClientMenuOpen}
+                onClose={() => setClientMenuOpen(false)}
+            />
+        </>
     );
 }
