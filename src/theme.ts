@@ -12,4 +12,7 @@ export default createMuiTheme({
             default: "#282c34",
         },
     },
+    typography: {
+        fontSize: 14,
+    },
 });
