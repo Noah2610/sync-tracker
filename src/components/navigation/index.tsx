@@ -1,7 +1,5 @@
 import { useWs } from "../../ws/ws-context";
 
-import "../../styles/navigation.module.css";
-
 export default function Navigation() {
     const ws = useWs();
 
