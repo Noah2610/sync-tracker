@@ -5,8 +5,8 @@ import {
     Box,
     Typography,
 } from "@material-ui/core";
-import Client from "../../lib/client";
-import Loading from "./loading";
+import Client from "../../../lib/client";
+import Loading from "../loading";
 
 export interface ClientNameProps {
     client: Client;

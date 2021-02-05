@@ -6,7 +6,6 @@ import {
     Container,
     Dialog,
     DialogContent,
-    DialogContentText,
     DialogProps,
     DialogTitle,
     FormControl,
@@ -14,9 +13,9 @@ import {
     TextField,
 } from "@material-ui/core";
 import { useState, FormEvent } from "react";
-import { useWs } from "../ws/ws-context";
-import ClientName from "./client-name";
-import Loading from "./loading";
+import { useWs } from "../../ws/ws-context";
+import Loading from "../loading";
+import ClientName from "./name";
 
 export type ClientNameDialogProps = {} & DialogProps;
 

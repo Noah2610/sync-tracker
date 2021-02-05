@@ -7,8 +7,7 @@ import {
 } from "@material-ui/core";
 import { useState } from "react";
 import { useWs } from "../../ws/ws-context";
-import ClientName from "../client-name";
-import ClientChangeNameDialog from "../client-change-name-dialog";
+import { ClientChangeNameDialog, ClientName } from "../client";
 import Loading from "../loading";
 
 const useStyles = makeStyles((theme) =>
