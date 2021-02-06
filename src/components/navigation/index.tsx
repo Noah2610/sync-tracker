@@ -4,6 +4,7 @@ import {
     AppBar,
     Box,
     Button,
+    Container,
     Toolbar,
 } from "@material-ui/core";
 import { useState } from "react";
@@ -32,20 +33,23 @@ export default function Navigation() {
     return (
         <>
             <AppBar position="relative">
-                <Toolbar className={styles.toolbar}>
-                    <Box>
+                <Container maxWidth="md">
+                    <Toolbar className={styles.toolbar}>
                         <ConnectedClients />
-                    </Box>
-                    <Box marginLeft={4}>
-                        {ws && ws.client ? (
-                            <Button variant="text" onClick={toggleClientMenu}>
-                                <ClientName client={ws.client} />
-                            </Button>
-                        ) : (
-                            <Loading />
-                        )}
-                    </Box>
-                </Toolbar>
+                        <Box>
+                            {ws && ws.client ? (
+                                <Button
+                                    variant="text"
+                                    onClick={toggleClientMenu}
+                                >
+                                    <ClientName client={ws.client} />
+                                </Button>
+                            ) : (
+                                <Loading />
+                            )}
+                        </Box>
+                    </Toolbar>
+                </Container>
             </AppBar>
 
             <ClientChangeNameDialog

@@ -3,6 +3,7 @@ import {
     makeStyles,
     Avatar,
     Box,
+    Tooltip,
     Typography,
 } from "@material-ui/core";
 import Client from "../../../lib/client";
@@ -29,6 +30,7 @@ const useStyles = makeStyles((_theme) =>
             fontWeight: "bold",
             lineHeight: 1.2,
             paddingTop: 4,
+            width: "inherit",
         },
     }),
 );
@@ -47,12 +49,20 @@ export default function ClientName({ client }: ClientNameProps) {
     return (
         <>
             {client.name && avatarLetters ? (
-                <Box className={styles.wrapper}>
-                    <Avatar>{avatarLetters}</Avatar>
-                    <Typography className={styles.name}>
-                        {client.name}
-                    </Typography>
-                </Box>
+                <Tooltip
+                    title={
+                        <Typography className={styles.name}>
+                            {client.name}
+                        </Typography>
+                    }
+                >
+                    <Box className={styles.wrapper}>
+                        <Avatar>{avatarLetters}</Avatar>
+                        <Typography className={styles.name} noWrap>
+                            {client.name}
+                        </Typography>
+                    </Box>
+                </Tooltip>
             ) : (
                 <Loading />
             )}

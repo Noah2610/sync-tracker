@@ -1,11 +1,11 @@
-import Head from "next/head";
-import type { AppProps } from "next/app";
 import { Container } from "@material-ui/core";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core";
-import { WsProvider } from "../ws/ws-context";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import type { AppProps } from "next/app";
+import Head from "next/head";
 import Navigation from "../components/navigation";
 import muiTheme from "../theme";
+import { WsProvider } from "../ws/ws-context";
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
