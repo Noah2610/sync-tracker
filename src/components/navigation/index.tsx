@@ -2,15 +2,20 @@ import {
     createStyles,
     makeStyles,
     AppBar,
+    Box,
     Button,
     Toolbar,
 } from "@material-ui/core";
 import { useState } from "react";
 import { useWs } from "../../ws/ws-context";
-import { ClientChangeNameDialog, ClientName } from "../client";
+import {
+    ClientChangeNameDialog,
+    ClientName,
+    ConnectedClients,
+} from "../client";
 import Loading from "../loading";
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((_theme) =>
     createStyles({
         toolbar: {
             justifyContent: "flex-end",
@@ -28,13 +33,18 @@ export default function Navigation() {
         <>
             <AppBar position="relative">
                 <Toolbar className={styles.toolbar}>
-                    {ws && ws.client ? (
-                        <Button variant="text" onClick={toggleClientMenu}>
-                            <ClientName client={ws.client} />
-                        </Button>
-                    ) : (
-                        <Loading />
-                    )}
+                    <Box>
+                        <ConnectedClients />
+                    </Box>
+                    <Box marginLeft={4}>
+                        {ws && ws.client ? (
+                            <Button variant="text" onClick={toggleClientMenu}>
+                                <ClientName client={ws.client} />
+                            </Button>
+                        ) : (
+                            <Loading />
+                        )}
+                    </Box>
                 </Toolbar>
             </AppBar>
 

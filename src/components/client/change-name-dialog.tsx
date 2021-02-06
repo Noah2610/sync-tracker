@@ -19,7 +19,7 @@ import ClientName from "./name";
 
 export type ClientNameDialogProps = {} & DialogProps;
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((_theme) =>
     createStyles({
         container: {
             display: "flex",
@@ -84,7 +84,8 @@ export default function ClientNameDialog(props: ClientNameDialogProps) {
                                         <TextField
                                             autoFocus
                                             value={name}
-                                            placeholder="New client name..."
+                                            label="New Name"
+                                            color="primary"
                                             variant="outlined"
                                             onChange={(event) =>
                                                 setName(
