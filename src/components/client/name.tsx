@@ -11,6 +11,7 @@ import Loading from "../loading";
 
 export interface ClientNameProps {
     client: Client;
+    size?: "normal" | "small";
 }
 
 const useStyles = makeStyles((_theme) =>
@@ -20,7 +21,6 @@ const useStyles = makeStyles((_theme) =>
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "center",
-            width: 128,
         },
         name: {
             display: "block",
@@ -35,8 +35,49 @@ const useStyles = makeStyles((_theme) =>
     }),
 );
 
-export default function ClientName({ client }: ClientNameProps) {
+const useNameStyles = makeStyles({
+    normal: {
+        fontSize: 14,
+        letterSpacing: 2,
+    },
+    small: {
+        fontSize: 10,
+        letterSpacing: 0,
+    },
+});
+
+const useAvatarStyles = makeStyles({
+    normal: {
+        fontSize: 18,
+        width: 40,
+        height: 40,
+    },
+    small: {
+        fontSize: 10,
+        width: 20,
+        height: 20,
+    },
+});
+
+export default function ClientName({
+    client,
+    size = "normal",
+}: ClientNameProps) {
     const styles = useStyles();
+    const nameStyles = useNameStyles();
+    const avatarStyles = useAvatarStyles();
+
+    let width = 128;
+    switch (size) {
+        case "normal": {
+            width = 128;
+            break;
+        }
+        case "small": {
+            width = 48;
+            break;
+        }
+    }
 
     const avatarLetters =
         client.name &&
@@ -56,9 +97,14 @@ export default function ClientName({ client }: ClientNameProps) {
                         </Typography>
                     }
                 >
-                    <Box className={styles.wrapper}>
-                        <Avatar>{avatarLetters}</Avatar>
-                        <Typography className={styles.name} noWrap>
+                    <Box className={styles.wrapper} width={width}>
+                        <Avatar className={avatarStyles[size]}>
+                            {avatarLetters}
+                        </Avatar>
+                        <Typography
+                            className={`${styles.name} ${nameStyles[size]}`}
+                            noWrap
+                        >
                             {client.name}
                         </Typography>
                     </Box>

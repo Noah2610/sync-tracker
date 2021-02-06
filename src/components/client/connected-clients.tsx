@@ -22,12 +22,16 @@ export default function ConnectedClients() {
         return <Loading />;
     }
 
+    const clients = ws.client
+        ? ws.connectedClients.filter((conn) => conn.id !== ws.client?.id)
+        : ws.connectedClients;
+
     return (
         <Box maxWidth="sm" className={styles.container}>
             <Box width="max-content" className={styles.scrollable}>
-                {ws.connectedClients.map((client) => (
+                {clients.map((client) => (
                     <Box key={client.id} display="inline-block">
-                        <ClientName client={client} />
+                        <ClientName client={client} size="small" />
                     </Box>
                 ))}
             </Box>
