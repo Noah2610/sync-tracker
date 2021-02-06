@@ -31,6 +31,7 @@ export type ClientMessage =
     | {
           kind: "UpdateClient";
           client: Client;
+          disconnected?: boolean;
       };
 
 const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
@@ -46,6 +47,7 @@ const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
     z.object({
         kind: z.literal("UpdateClient"),
         client: ClientSchema,
+        disconnected: z.boolean().optional(),
     }),
 ]);
 

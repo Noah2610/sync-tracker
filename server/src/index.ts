@@ -46,6 +46,14 @@ export function startWs(state: State) {
                 }).`,
             );
             state.removeClientConnection(client.client.id);
+            // Inform all other connections of client disconnection.
+            state.connections.forEach((conn) => {
+                sendMessage(conn, {
+                    kind: "UpdateClient",
+                    client: client.client,
+                    disconnected: true,
+                });
+            });
         });
 
         client.ws.on("message", (data) => {

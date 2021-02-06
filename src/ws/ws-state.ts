@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
-import { ServerMessage } from "../../lib/message";
 import Client from "../../lib/client";
+import { ServerMessage } from "../../lib/message";
 import WsMessageEmitter from "./ws-message-emitter";
 
 const WS_URL =
@@ -65,18 +65,20 @@ function setupCoreListeners(
     state.messages.on("UpdateClient", (message) => {
         update((prev) => {
             const connectedClients: Client[] = [];
-            let didExist = false;
+            let isNewClient = true;
 
             for (const conn of prev.connectedClients) {
                 if (conn.id === message.client.id) {
-                    connectedClients.push(message.client);
-                    didExist = true;
+                    if (!message.disconnected) {
+                        connectedClients.push(message.client);
+                    }
+                    isNewClient = false;
                 } else {
                     connectedClients.push(conn);
                 }
             }
 
-            if (!didExist) {
+            if (isNewClient && !message.disconnected) {
                 connectedClients.push(message.client);
             }
 
