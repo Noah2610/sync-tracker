@@ -39,7 +39,13 @@
                     "note": "B2",
                     "beats": [6]
                 }
-            ]
+            ],
+            "instrument": {
+                "instrument": "Synth",
+                "options": {
+                    "volume": 50
+                }
+            }
         },
         {
             "id": 1,
@@ -57,7 +63,16 @@
                     "note": "E3",
                     "beats": [2]
                 }
-            ]
+            ],
+            "instrument": {
+                "instrument": "NoiseSynth",
+                "options": {
+                    "volume": 50,
+                    "noise": {
+                        "type": "pink"
+                    }
+                }
+            }
         }
     ]
 }

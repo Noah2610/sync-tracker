@@ -4,6 +4,7 @@ import Pattern from "../../../../lib/track/pattern";
 import BeatCell from "./beat-cell";
 import NoteCell from "./note-cell";
 import { BeatTableRow, TableBody } from "./styles";
+import useInstrument, { ToneInstrument } from "../../../hooks/use-instrument";
 
 export interface GridTableBodyProps {
     pattern: Pattern;
@@ -26,11 +27,17 @@ export default function GridTableBody({
     toggleBeat,
     cellClassName,
 }: GridTableBodyProps) {
+    const instrument = useInstrument(pattern.instrument) || undefined;
+
     return (
         <TableBody>
             {pattern.notes.map((note, i) => (
                 <BeatTableRow key={i}>
-                    <NoteCell component="th" note={note.note} />
+                    <NoteCell
+                        component="th"
+                        note={note.note}
+                        instrument={instrument}
+                    />
                     {Array.from({ length: patternLen }, (_, step) => {
                         const isActive = note.beats.includes(step);
                         return (

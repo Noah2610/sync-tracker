@@ -1,15 +1,15 @@
 import { createStyles, makeStyles, TableCellProps } from "@material-ui/core";
 import { useCallback } from "react";
-import { Time } from "tone/Tone/core/type/Units";
 import Note from "../../../../lib/track/note";
-import useSynth from "../../../hooks/use-synth";
 import { NoteTableCell } from "./styles";
+import { ToneInstrument } from "../../../hooks/use-instrument";
 
 export type NoteCellProps = {
     note: Note;
+    instrument?: ToneInstrument;
 } & TableCellProps;
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((_theme) =>
     createStyles({
         root: {
             cursor: "pointer",
@@ -17,17 +17,27 @@ const useStyles = makeStyles((theme) =>
     }),
 );
 
-export default function NoteCell({ note, children, ...props }: NoteCellProps) {
-    const synth = useSynth({
-        volume: 50.0,
-    });
+export default function NoteCell({
+    note,
+    instrument,
+    children,
+    ...props
+}: NoteCellProps) {
     const styles = useStyles();
 
-    const playNote = useCallback(() => synth?.triggerAttack(note, 0), [
+    const playNote = useCallback(() => {
+        if (instrument) {
+            if (instrument.name === "NoiseSynth") {
+                instrument?.triggerAttack();
+            } else {
+                instrument?.triggerAttack(note, 0);
+            }
+        }
+    }, [note, instrument]);
+    const stopNote = useCallback(() => instrument?.triggerRelease(0), [
         note,
-        synth,
+        instrument,
     ]);
-    const stopNote = useCallback(() => synth?.triggerRelease(0), [note, synth]);
 
     return (
         <NoteTableCell

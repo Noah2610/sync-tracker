@@ -1,5 +1,6 @@
 import * as z from "zod";
 import Beat, { BeatSchema } from "./beat";
+import Instrument, { InstrumentSchema } from "./instrument";
 import Note, { NoteSchema } from "./note";
 
 /**
@@ -12,6 +13,11 @@ export default interface Pattern {
     id: PatternId;
     name: string;
     notes: PatternNote[];
+    /**
+     * Which instrument to use for this pattern.
+     * Instruments come from Tone.js
+     */
+    instrument: Instrument;
 }
 
 export type PatternId = number;
@@ -42,4 +48,5 @@ export const PatternSchema: z.ZodSchema<Pattern> = z.object({
     id: PatternIdSchema,
     name: z.string(),
     notes: z.array(PatternNoteSchema),
+    instrument: InstrumentSchema,
 });
