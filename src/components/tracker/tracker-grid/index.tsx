@@ -56,6 +56,7 @@ export default function TrackerGrid({
                     cellClassName={styles.cell}
                 />
                 <GridTableBody
+                    key={pattern.id}
                     pattern={pattern}
                     patternLen={patternLen}
                     toggleBeat={toggleBeat}

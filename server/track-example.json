@@ -40,6 +40,24 @@
                     "beats": [6]
                 }
             ]
+        },
+        {
+            "id": 1,
+            "name": "Pattern 2",
+            "notes": [
+                {
+                    "note": "C3",
+                    "beats": [6]
+                },
+                {
+                    "note": "D3",
+                    "beats": [4]
+                },
+                {
+                    "note": "E3",
+                    "beats": [2]
+                }
+            ]
         }
     ]
 }

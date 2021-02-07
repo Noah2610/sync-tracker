@@ -1,9 +1,10 @@
 import { Box } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PatternId } from "../../../lib/track/pattern";
 import useTrack from "../../hooks/use-track";
 import useWs from "../../hooks/use-ws";
 import Loading from "../loading";
+import PatternList from "./pattern-list";
 import TrackerGrid from "./tracker-grid";
 
 export default function Tracker() {
@@ -23,6 +24,11 @@ export default function Tracker() {
         }
     }, [track]);
 
+    const selectPattern = useCallback(
+        (patternId: PatternId) => setSelectedPatternId(patternId),
+        [],
+    );
+
     if (!ws) {
         return <Loading />;
     }
@@ -41,6 +47,8 @@ export default function Tracker() {
             ? track.patterns.find((pat) => pat.id === selectedPatternId)
             : undefined;
 
+    console.log(selectedPattern?.id);
+
     return (
         <Box>
             {selectedPattern ? (
@@ -53,6 +61,12 @@ export default function Tracker() {
             ) : (
                 <>No pattern selected.</>
             )}
+
+            <PatternList
+                patterns={track.patterns}
+                selectedPatternId={selectedPatternId ?? undefined}
+                selectPattern={selectPattern}
+            />
         </Box>
     );
 }
