@@ -47,8 +47,6 @@ export default function Tracker() {
             ? track.patterns.find((pat) => pat.id === selectedPatternId)
             : undefined;
 
-    console.log(selectedPattern?.id);
-
     return (
         <Box>
             {selectedPattern ? (

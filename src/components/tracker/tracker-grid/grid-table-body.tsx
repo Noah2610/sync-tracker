@@ -2,7 +2,8 @@ import Beat from "../../../../lib/track/beat";
 import Note from "../../../../lib/track/note";
 import Pattern from "../../../../lib/track/pattern";
 import BeatCell from "./beat-cell";
-import { BeatTableRow, NoteTableCell, TableBody } from "./styles";
+import NoteCell from "./note-cell";
+import { BeatTableRow, TableBody } from "./styles";
 
 export interface GridTableBodyProps {
     pattern: Pattern;
@@ -29,7 +30,7 @@ export default function GridTableBody({
         <TableBody>
             {pattern.notes.map((note, i) => (
                 <BeatTableRow key={i}>
-                    <NoteTableCell component="th">{note.note}</NoteTableCell>
+                    <NoteCell component="th" note={note.note} />
                     {Array.from({ length: patternLen }, (_, step) => {
                         const isActive = note.beats.includes(step);
                         return (
