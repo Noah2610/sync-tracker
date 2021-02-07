@@ -37,9 +37,24 @@ export default class WsMessageEmitter {
     }
 
     /**
+     * Remove a registered event listener for the given kind of WS message.
+     */
+    public remove<K extends ClientMessage["kind"]>(
+        kind: K,
+        listener: WsMessageListener<K>,
+    ) {
+        const events = this.getEventsOfKind(kind);
+        let idx = events.indexOf(listener);
+        while (idx > -1) {
+            events.splice(idx, 1);
+            idx = events.indexOf(listener);
+        }
+    }
+
+    /**
      * Emit an event based on the WS message kind.
      */
-    public emit<K extends ClientMessage["kind"]>(
+    private emit<K extends ClientMessage["kind"]>(
         message: ClientMessageOfKind<K>,
     ) {
         this.getEventsOfKind(message.kind).forEach((listener) =>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Track from "../../lib/track";
 import { updateTrackBeat } from "../../lib/track/update";
+import { ClientMessageOfKind } from "../../lib/message";
 import useWs from "./use-ws";
 
 /**
@@ -12,11 +13,16 @@ export default function useTrack(): Track | null {
 
     useEffect(() => {
         if (ws) {
-            ws.messages.on("UpdateTrack", ({ track: newTrack }) => {
-                setTrack(newTrack);
-            });
+            const updateTrackListener = ({
+                track: newTrack,
+            }: {
+                track: Track;
+            }) => setTrack(newTrack);
+            ws.messages.on("UpdateTrack", updateTrackListener);
 
-            ws.messages.on("UpdateTrackBeat", (message) => {
+            const updateTrackBeatListener = (
+                message: ClientMessageOfKind<"UpdateTrackBeat">,
+            ) =>
                 setTrack((prev) => {
                     if (prev) {
                         const { track: newTrack, didUpdate } = updateTrackBeat(
@@ -35,7 +41,12 @@ export default function useTrack(): Track | null {
                         return prev;
                     }
                 });
-            });
+            ws.messages.on("UpdateTrackBeat", updateTrackBeatListener);
+
+            return () => {
+                ws.messages.remove("UpdateTrack", updateTrackListener);
+                ws.messages.remove("UpdateTrackBeat", updateTrackBeatListener);
+            };
         }
     }, []);
 
