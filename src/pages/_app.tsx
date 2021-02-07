@@ -15,9 +15,10 @@ export default function App({ Component, pageProps }: AppProps) {
                     name="viewport"
                     content="minimum-scale=1, initial-scale=1, width=device-width"
                 />
+                <link rel="preconnect" href="https://fonts.gstatic.com" />
                 <link
                     rel="stylesheet"
-                    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+                    href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100;400;700&family=Roboto:wght@100;400;900&display=swap"
                 />
             </Head>
             <ThemeProvider theme={muiTheme}>
