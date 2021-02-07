@@ -1,31 +1,65 @@
 import WebSocket from "ws";
-import { ClientMessage, parseServerMessage } from "../../lib/message";
 import ClientConnection from "./client-connection";
+import handleMessage from "./handle-message";
+import sendMessage from "./send-message";
 import State from "./state";
 
 const HOST = "0.0.0.0";
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8090;
 
 export function startWs(state: State) {
-    const server = new WebSocket.Server({ host: HOST, port: PORT }, () =>
-        console.log(`WebSocket running on ws://${HOST}:${PORT}`),
-    );
+    const server = createServer();
 
-    function sendMessage(client: ClientConnection, message: ClientMessage) {
-        const messageRaw = JSON.stringify(message);
-        client.ws.send(messageRaw);
-    }
-
-    server.on("connection", (ws) => {
+    /**
+     * Handle a new client connection.
+     */
+    function handleConnection(ws: WebSocket) {
         const client = state.addClientConnection(ws);
-
         console.log(`Client ${client.client.id} connected.`);
 
+        informNewClient(client);
+
+        client.ws.on("close", (code, reason) => {
+            handleClose(client, { code, reason });
+        });
+
+        client.ws.on("message", (data) => {
+            handleMessage(state, client, data);
+        });
+    }
+
+    /**
+     * Handle a closed client connection.
+     */
+    function handleClose(
+        client: ClientConnection,
+        { code, reason }: { code: number; reason: string },
+    ) {
+        console.log(
+            `Client ${client.client.id} disconnected (${code}${
+                reason && " " + reason
+            }).`,
+        );
+        state.removeClientConnection(client.client.id);
+        // Inform all other connections of client disconnection.
+        state.connections.forEach((conn) => {
+            sendMessage(conn, {
+                kind: "UpdateClient",
+                client: client.client,
+                disconnected: true,
+            });
+        });
+    }
+
+    /**
+     * Inform newly connected client of relevant data.
+     * Inform every existing connection of new client.
+     */
+    function informNewClient(client: ClientConnection) {
         sendMessage(client, {
             kind: "Connected",
             client: client.client,
         });
-
         state.connections.forEach((conn) => {
             // Inform new client of all existing connections.
             sendMessage(client, {
@@ -38,55 +72,15 @@ export function startWs(state: State) {
                 client: client.client,
             });
         });
+    }
 
-        client.ws.on("close", (code, reason) => {
-            console.log(
-                `Client ${client.client.id} disconnected (${code}${
-                    reason && " " + reason
-                }).`,
-            );
-            state.removeClientConnection(client.client.id);
-            // Inform all other connections of client disconnection.
-            state.connections.forEach((conn) => {
-                sendMessage(conn, {
-                    kind: "UpdateClient",
-                    client: client.client,
-                    disconnected: true,
-                });
-            });
-        });
-
-        client.ws.on("message", (data) => {
-            const message = parseServerMessage(data);
-            if (message) {
-                switch (message.kind) {
-                    case "Message": {
-                        state.connections.forEach((conn) =>
-                            sendMessage(conn, {
-                                kind: "Message",
-                                client: client.client,
-                                content: message.content,
-                            }),
-                        );
-                        break;
-                    }
-
-                    case "UpdateClientName": {
-                        client.client.name = message.name;
-                        state.connections.forEach((conn) =>
-                            sendMessage(conn, {
-                                kind: "UpdateClient",
-                                client: client.client,
-                            }),
-                        );
-                        break;
-                    }
-
-                    default: {
-                        console.error("Unknown ServerMessage", message);
-                    }
-                }
-            }
-        });
+    server.on("connection", (ws) => {
+        handleConnection(ws);
     });
+}
+
+function createServer(): WebSocket.Server {
+    return new WebSocket.Server({ host: HOST, port: PORT }, () =>
+        console.log(`WebSocket running on ws://${HOST}:${PORT}`),
+    );
 }
