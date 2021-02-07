@@ -8,5 +8,8 @@ export type {
     ServerMessageOfKind,
 } from "./server-message";
 export { parseServerMessage } from "./server-message";
-export type { default as SharedMessage } from "./shared-message";
+export type {
+    default as SharedMessage,
+    SharedMessageOfKind,
+} from "./shared-message";
 export { SharedMessageShema } from "./shared-message";

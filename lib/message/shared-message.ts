@@ -22,6 +22,12 @@ type SharedMessage =
           kind: "Undefined";
       };
 
+export type SharedMessageOfKind<
+    K extends SharedMessage["kind"]
+> = SharedMessage & {
+    kind: K;
+};
+
 export const SharedMessageShema: z.ZodSchema<SharedMessage> = z.union([
     z.object({
         kind: z.literal("UpdateTrackBeat"),

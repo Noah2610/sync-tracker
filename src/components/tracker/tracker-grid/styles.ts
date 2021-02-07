@@ -54,16 +54,14 @@ export const BeatTableCell = withStyles((theme) => {
     const color =
         theme.tracker.colors.cells.border.alt ||
         theme.tracker.colors.cells.border.main;
-    const activeColor = theme.tracker.colors.cells.active.main;
     return createStyles({
-        root: ({ active }: { active: boolean }) => ({
-            backgroundColor: active ? activeColor : "inherit",
+        root: {
             "&:hover": {
                 cursor: "pointer",
                 borderColor: color,
                 boxShadow: `inset 0 0 4px 4px ${color}`,
             },
-        }),
+        },
     });
 })(TableCell);
 

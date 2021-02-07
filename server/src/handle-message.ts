@@ -1,5 +1,6 @@
 import WebSocket from "ws";
 import { parseServerMessage, ServerMessageOfKind } from "../../lib/message";
+import { updateTrackBeat } from "../../lib/track/update";
 import ClientConnection from "./client-connection";
 import sendMessage from "./send-message";
 import State from "./state";
@@ -54,30 +55,14 @@ function handleMessageUpdateTrackBeat(
     client: ClientConnection,
     message: ServerMessageOfKind<"UpdateTrackBeat">,
 ) {
-    const { patternId, note, step, active } = message;
-    const pattern = state.track.patterns.find((pat) => pat.id === patternId);
-    if (pattern) {
-        const patternNote = pattern.notes.find((n) => n.note === note);
-        if (patternNote) {
-            let didChange = false;
-            const alreadyActive = patternNote.beats.includes(step);
-            if (active && !alreadyActive) {
-                patternNote.beats.push(step);
-                didChange = true;
-            } else if (!active && alreadyActive) {
-                const idx = patternNote.beats.indexOf(step);
-                if (idx !== -1) {
-                    patternNote.beats.splice(idx, 1);
-                }
-                didChange = true;
-            }
-            if (didChange) {
-                state.connections.forEach((conn) => sendMessage(conn, message));
-            }
-        } else {
-            console.error(`Note ${note} in pattern ${patternId} not found.`);
+    const { track: newTrack, didUpdate } = updateTrackBeat(
+        state.track,
+        message,
+    );
+    if (didUpdate) {
+        state.track = newTrack;
+        if (didUpdate) {
+            state.connections.forEach((conn) => sendMessage(conn, message));
         }
-    } else {
-        console.error(`Pattern with PatternId ${patternId} not found.`);
     }
 }

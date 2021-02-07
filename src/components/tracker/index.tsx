@@ -2,6 +2,7 @@ import { Box } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import Track from "../../../lib/track";
 import Pattern, { PatternId } from "../../../lib/track/pattern";
+import { updateTrackBeat } from "../../../lib/track/update";
 import useWs from "../../hooks/use-ws";
 import Loading from "../loading";
 import TrackerGrid from "./tracker-grid";
@@ -16,14 +17,35 @@ export default function Tracker() {
 
     useEffect(() => {
         if (ws) {
-            ws.messages.on("UpdateTrack", ({ track }) => {
-                setTrack(track);
+            ws.messages.on("UpdateTrack", ({ track: newTrack }) => {
+                setTrack(newTrack);
                 if (selectedPatternId === null) {
-                    const pattern = track.patterns[0];
+                    const pattern = newTrack.patterns[0];
                     if (pattern) {
                         setSelectedPatternId(pattern.id);
                     }
                 }
+            });
+            ws.messages.on("UpdateTrackBeat", (message) => {
+                setTrack((prev) => {
+                    if (prev) {
+                        const { track: newTrack, didUpdate } = updateTrackBeat(
+                            prev,
+                            message,
+                        );
+                        if (didUpdate) {
+                            console.log(newTrack);
+                            return newTrack;
+                        } else {
+                            return prev;
+                        }
+                    } else {
+                        console.error(
+                            "Can't update track, no track data received yet.",
+                        );
+                        return prev;
+                    }
+                });
             });
         }
     }, []);
@@ -52,6 +74,7 @@ export default function Tracker() {
         <Box>
             {selectedPattern ? (
                 <TrackerGrid
+                    ws={ws}
                     pattern={selectedPattern}
                     patternLen={track.config.patternLen}
                 />
