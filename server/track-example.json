@@ -1,0 +1,45 @@
+{
+    "name": "Example Track",
+    "config": {
+        "bpm": 120,
+        "patternLen": 16,
+        "barLen": 4
+    },
+    "patternArrangement": [],
+    "patterns": [
+        {
+            "id": 0,
+            "name": "Pattern 1",
+            "notes": [
+                {
+                    "note": "C2",
+                    "beats": [0]
+                },
+                {
+                    "note": "D2",
+                    "beats": [1]
+                },
+                {
+                    "note": "E2",
+                    "beats": [2]
+                },
+                {
+                    "note": "F2",
+                    "beats": [3]
+                },
+                {
+                    "note": "G2",
+                    "beats": [4]
+                },
+                {
+                    "note": "A2",
+                    "beats": [5]
+                },
+                {
+                    "note": "B2",
+                    "beats": [6]
+                }
+            ]
+        }
+    ]
+}

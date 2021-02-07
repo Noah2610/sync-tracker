@@ -1,5 +1,6 @@
 import * as z from "zod";
 import Client, { ClientSchema } from "../client";
+import Track, { TrackSchema } from "../track";
 
 /**
  * Message for a client.
@@ -32,6 +33,16 @@ export type ClientMessage =
           kind: "UpdateClient";
           client: Client;
           disconnected?: boolean;
+      }
+    /**
+     * UpdateTrack.
+     * Sends the whole track config to the client.
+     * Is sent once initially when a client loads a track.
+     * Any further track updates should be smaller, separate client messages.
+     */
+    | {
+          kind: "UpdateTrack";
+          track: Track;
       };
 
 const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
@@ -48,6 +59,10 @@ const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
         kind: z.literal("UpdateClient"),
         client: ClientSchema,
         disconnected: z.boolean().optional(),
+    }),
+    z.object({
+        kind: z.literal("UpdateTrack"),
+        track: TrackSchema,
     }),
 ]);
 

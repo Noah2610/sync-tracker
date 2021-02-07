@@ -22,13 +22,13 @@ export interface TrackConfig {
     barLen: number;
 }
 
-const TrackConfigSchema: z.ZodSchema<TrackConfig> = z.object({
+export const TrackConfigSchema: z.ZodSchema<TrackConfig> = z.object({
     bpm: z.number().int().positive(),
     patternLen: z.number().int().positive(),
     barLen: z.number().int().positive(),
 });
 
-const TrackSchema: z.ZodSchema<Track> = z.object({
+export const TrackSchema: z.ZodSchema<Track> = z.object({
     name: z.string(),
     config: TrackConfigSchema,
     patternArrangement: z.array(PatternIdSchema),

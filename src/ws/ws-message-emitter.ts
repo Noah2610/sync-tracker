@@ -1,4 +1,4 @@
-import { ClientMessage, parseClientMessage } from "../../lib/message";
+import { parseClientMessage, ClientMessage } from "../../lib/message";
 
 type ClientMessageOfKind<K extends ClientMessage["kind"]> = ClientMessage & {
     kind: K;
@@ -16,16 +16,12 @@ type WsMessageListener<K extends ClientMessage["kind"]> = (
 export default class WsMessageEmitter {
     private ws: WebSocket;
     private events: {
-        [K in ClientMessage["kind"]]: WsMessageListener<K>[];
+        [K in ClientMessage["kind"]]?: WsMessageListener<K>[];
     };
 
     constructor(ws: WebSocket) {
         this.ws = ws;
-        this.events = {
-            Connected: [],
-            Message: [],
-            UpdateClient: [],
-        };
+        this.events = {};
 
         this.setupWsListener();
     }
@@ -54,6 +50,9 @@ export default class WsMessageEmitter {
     private getEventsOfKind<K extends ClientMessage["kind"]>(
         kind: K,
     ): WsMessageListener<K>[] {
+        if (!this.events[kind]) {
+            this.events[kind] = [];
+        }
         return this.events[kind] as WsMessageListener<K>[];
     }
 

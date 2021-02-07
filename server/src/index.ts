@@ -4,6 +4,9 @@ import handleMessage from "./handle-message";
 import sendMessage from "./send-message";
 import State from "./state";
 
+import Track from "../../lib/track";
+import trackExample from "../track-example.json";
+
 const HOST = "0.0.0.0";
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8090;
 
@@ -18,6 +21,12 @@ export function startWs(state: State) {
         console.log(`Client ${client.client.id} connected.`);
 
         informNewClient(client);
+
+        // TODO
+        sendMessage(client, {
+            kind: "UpdateTrack",
+            track: trackExample as Track,
+        });
 
         client.ws.on("close", (code, reason) => {
             handleClose(client, { code, reason });
