@@ -47,6 +47,8 @@ export default function useInstrument(
 
             return () => instrument?.dispose();
         }
+
+        return () => {};
     }, []);
 
     return instrument;
