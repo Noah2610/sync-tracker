@@ -35,6 +35,7 @@ export default function NoteCell({ note, children, ...props }: NoteCellProps) {
             className={styles.root}
             onMouseDown={playNote}
             onMouseUp={stopNote}
+            onMouseLeave={stopNote}
         >
             {note}
             {children}
