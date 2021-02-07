@@ -1,8 +1,6 @@
 import {
     createStyles,
-    makeStyles,
     withStyles,
-    Box,
     Table as MuiTable,
     TableBody as MuiTableBody,
     TableCell as MuiTableCell,
@@ -10,19 +8,13 @@ import {
     TableHead as MuiTableHead,
     TableRow as MuiTableRow,
 } from "@material-ui/core";
-import Pattern from "../../../lib/track/pattern";
 
-export interface TrackerGridProps {
-    pattern: Pattern;
-    patternLen: number;
-}
+export const Table = MuiTable;
+export const TableContainer = MuiTableContainer;
+export const TableHead = MuiTableHead;
+export const TableBody = MuiTableBody;
 
-const Table = MuiTable;
-const TableContainer = MuiTableContainer;
-const TableHead = MuiTableHead;
-const TableBody = MuiTableBody;
-
-const TableCell = withStyles((theme) =>
+export const TableCell = withStyles((theme) =>
     createStyles({
         root: {
             color: theme.palette.text.primary,
@@ -40,7 +32,7 @@ const TableCell = withStyles((theme) =>
     }),
 )(MuiTableCell);
 
-const HeadTableCell = withStyles((theme) =>
+export const HeadTableCell = withStyles((theme) =>
     createStyles({
         root: {
             fontWeight: "bold",
@@ -49,7 +41,7 @@ const HeadTableCell = withStyles((theme) =>
     }),
 )(TableCell);
 
-const NoteTableCell = withStyles((theme) =>
+export const NoteTableCell = withStyles((theme) =>
     createStyles({
         root: {
             fontWeight: "bold",
@@ -58,22 +50,24 @@ const NoteTableCell = withStyles((theme) =>
     }),
 )(TableCell);
 
-const BeatTableCell = withStyles((theme) => {
+export const BeatTableCell = withStyles((theme) => {
     const color =
         theme.tracker.colors.cells.border.alt ||
         theme.tracker.colors.cells.border.main;
+    const activeColor = theme.tracker.colors.cells.active.main;
     return createStyles({
-        root: {
+        root: ({ active }: { active: boolean }) => ({
+            backgroundColor: active ? activeColor : "inherit",
             "&:hover": {
                 cursor: "pointer",
                 borderColor: color,
                 boxShadow: `inset 0 0 4px 4px ${color}`,
             },
-        },
+        }),
     });
 })(TableCell);
 
-const TableRow = withStyles((theme) =>
+export const TableRow = withStyles((theme) =>
     createStyles({
         root: {
             height: 16,
@@ -81,13 +75,13 @@ const TableRow = withStyles((theme) =>
     }),
 )(MuiTableRow);
 
-const HeadTableRow = withStyles((theme) =>
+export const HeadTableRow = withStyles((theme) =>
     createStyles({
         root: {},
     }),
 )(TableRow);
 
-const BeatTableRow = withStyles((theme) =>
+export const BeatTableRow = withStyles((theme) =>
     createStyles({
         root: {
             "&:nth-child(even)": {
@@ -99,33 +93,3 @@ const BeatTableRow = withStyles((theme) =>
         },
     }),
 )(TableRow);
-
-export default function TrackerGrid({ pattern, patternLen }: TrackerGridProps) {
-    const patternLenArr = new Array(patternLen).fill(undefined);
-    return (
-        <TableContainer>
-            <Table>
-                <TableHead>
-                    <HeadTableRow>
-                        <TableCell />
-                        {patternLenArr.map((_, step) => (
-                            <HeadTableCell key={step}>{step + 1}</HeadTableCell>
-                        ))}
-                    </HeadTableRow>
-                </TableHead>
-                <TableBody>
-                    {pattern.notes.map((note, i) => (
-                        <BeatTableRow key={i}>
-                            <NoteTableCell>{note.note}</NoteTableCell>
-                            {patternLenArr.map((_, step) => (
-                                <BeatTableCell
-                                    key={`${i}-${step}`}
-                                ></BeatTableCell>
-                            ))}
-                        </BeatTableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    );
-}

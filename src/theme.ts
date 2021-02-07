@@ -16,6 +16,7 @@ interface TrackerTheme {
             even: TrackerColorOptions;
             odd: TrackerColorOptions;
             border: TrackerColorOptions;
+            active: TrackerColorOptions;
         };
     };
 }
@@ -73,6 +74,9 @@ export default createMuiTheme({
                     main: "#000000",
                     alt: "#ffffff",
                 },
+                active: {
+                    main: COLORS.secondary,
+                }
             },
         },
     },
