@@ -1,5 +1,5 @@
-import { memo } from "react";
 import { createStyles, makeStyles, TableCellProps } from "@material-ui/core";
+import { memo } from "react";
 import { BeatTableCell } from "./styles";
 
 export type BeatCellProps = {

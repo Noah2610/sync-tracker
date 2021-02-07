@@ -1,20 +1,12 @@
 import { createStyles, makeStyles } from "@material-ui/core";
+import { useCallback } from "react";
 import Beat from "../../../../lib/track/beat";
 import Note from "../../../../lib/track/note";
 import Pattern from "../../../../lib/track/pattern";
 import WsState from "../../../ws/ws-state";
-import BeatCell from "./beat-cell";
-import {
-    BeatTableRow,
-    HeadTableCell,
-    HeadTableRow,
-    NoteTableCell,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-} from "./styles";
+import GridTableBody from "./grid-table-body";
+import GridTableHead from "./grid-table-head";
+import { Table, TableContainer } from "./styles";
 
 export interface TrackerGridProps {
     ws: WsState;
@@ -23,12 +15,11 @@ export interface TrackerGridProps {
     barLen: number;
 }
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((_theme) =>
     createStyles({
         cell: ({ barLen }: { barLen: number }) => ({
             [`&:nth-of-type(${barLen}n)`]: {
                 borderRightWidth: 2,
-                // borderLeftWidth: 2,
             },
             [`&:nth-of-type(${barLen}n+1):not(:nth-of-type(1))`]: {
                 borderLeftWidth: 2,
@@ -45,61 +36,31 @@ export default function TrackerGrid({
 }: TrackerGridProps) {
     const styles = useStyles({ barLen });
 
-    const patternLenArr = new Array(patternLen).fill(undefined);
-
-    const toggleBeat = (note: Note, step: Beat, active: boolean) =>
-        ws.sendMessage({
-            kind: "UpdateTrackBeat",
-            patternId: pattern.id,
-            note,
-            step,
-            active,
-        });
+    const toggleBeat = useCallback(
+        ({ note, step, active }: { note: Note; step: Beat; active: boolean }) =>
+            ws.sendMessage({
+                kind: "UpdateTrackBeat",
+                patternId: pattern.id,
+                note,
+                step,
+                active,
+            }),
+        [pattern.id],
+    );
 
     return (
         <TableContainer>
             <Table>
-                <TableHead>
-                    <HeadTableRow>
-                        <TableCell component="td" />
-                        {patternLenArr.map((_, step) => (
-                            <HeadTableCell
-                                key={step}
-                                className={styles.cell}
-                                component="th"
-                            >
-                                {step + 1}
-                            </HeadTableCell>
-                        ))}
-                    </HeadTableRow>
-                </TableHead>
-                <TableBody>
-                    {pattern.notes.map((note, i) => (
-                        <BeatTableRow key={i}>
-                            <NoteTableCell component="th">
-                                {note.note}
-                            </NoteTableCell>
-                            {patternLenArr.map((_, step) => {
-                                const isActive = note.beats.includes(step);
-                                return (
-                                    <BeatCell
-                                        key={`${i}-${step}`}
-                                        className={styles.cell}
-                                        component="td"
-                                        isActive={isActive}
-                                        toggle={() =>
-                                            toggleBeat(
-                                                note.note,
-                                                step,
-                                                !isActive,
-                                            )
-                                        }
-                                    />
-                                );
-                            })}
-                        </BeatTableRow>
-                    ))}
-                </TableBody>
+                <GridTableHead
+                    patternLen={patternLen}
+                    cellClassName={styles.cell}
+                />
+                <GridTableBody
+                    pattern={pattern}
+                    patternLen={patternLen}
+                    toggleBeat={toggleBeat}
+                    cellClassName={styles.cell}
+                />
             </Table>
         </TableContainer>
     );

@@ -65,7 +65,7 @@ export const BeatTableCell = withStyles((theme) => {
     });
 })(TableCell);
 
-export const TableRow = withStyles((theme) =>
+export const TableRow = withStyles((_theme) =>
     createStyles({
         root: {
             height: 16,
@@ -73,7 +73,7 @@ export const TableRow = withStyles((theme) =>
     }),
 )(MuiTableRow);
 
-export const HeadTableRow = withStyles((theme) =>
+export const HeadTableRow = withStyles((_theme) =>
     createStyles({
         root: {},
     }),
