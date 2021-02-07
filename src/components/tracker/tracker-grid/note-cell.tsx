@@ -28,6 +28,7 @@ export default function NoteCell({
     const playNote = useCallback(() => {
         if (instrument) {
             if (instrument.name === "NoiseSynth") {
+                // @ts-ignore
                 instrument?.triggerAttack();
             } else {
                 instrument?.triggerAttack(note, 0);

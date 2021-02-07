@@ -69,7 +69,7 @@
                 "options": {
                     "volume": 50,
                     "noise": {
-                        "type": "pink"
+                        "type": "white"
                     }
                 }
             }
