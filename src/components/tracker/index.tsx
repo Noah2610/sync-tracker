@@ -74,6 +74,7 @@ export default function Tracker() {
                     ws={ws}
                     pattern={selectedPattern}
                     patternLen={track.config.patternLen}
+                    barLen={track.config.barLen}
                 />
             ) : (
                 <>No pattern selected.</>
