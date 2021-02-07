@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { createStyles, makeStyles, TableCellProps } from "@material-ui/core";
 import { BeatTableCell } from "./styles";
 
@@ -15,12 +16,13 @@ const useStyles = makeStyles((theme) =>
     }),
 );
 
-export default function BeatCell({
-    isActive,
-    toggle,
-    ...props
-}: BeatCellProps) {
-    const styles = useStyles({ isActive });
-    const className = `${styles.root} ${props.className || ""}`;
-    return <BeatTableCell {...props} className={className} onClick={toggle} />;
-}
+export default memo(
+    function BeatCell({ isActive, toggle, ...props }: BeatCellProps) {
+        const styles = useStyles({ isActive });
+        const className = `${styles.root} ${props.className || ""}`;
+        return (
+            <BeatTableCell {...props} className={className} onClick={toggle} />
+        );
+    },
+    (prev, next) => prev.isActive === next.isActive,
+);
