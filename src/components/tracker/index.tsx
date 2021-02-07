@@ -34,7 +34,6 @@ export default function Tracker() {
                             message,
                         );
                         if (didUpdate) {
-                            console.log(newTrack);
                             return newTrack;
                         } else {
                             return prev;
@@ -67,8 +66,6 @@ export default function Tracker() {
         selectedPatternId !== null
             ? track.patterns.find((pat) => pat.id === selectedPatternId)
             : undefined;
-
-    console.log(track, selectedPatternId);
 
     return (
         <Box>
