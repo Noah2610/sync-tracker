@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import Client from "../../lib/client";
-import { ServerMessage } from "../../lib/message";
+import { ServerMessage, ClientMessageOfKind } from "../../lib/message";
 import WsMessageEmitter from "./ws-message-emitter";
 
 const WS_URL =
@@ -10,8 +10,10 @@ export default interface WsState {
     ws: WebSocket;
     client?: Client;
     connectedClients: Client[];
-    sendMessage(message: ServerMessage): void;
+    sendMessage: (message: ServerMessage) => void;
     messages: WsMessageEmitter;
+
+    cleanup?: () => void;
 }
 
 function createWs(): WebSocket | null {
@@ -36,6 +38,10 @@ export function createWsState(
         throw new Error("Couldn't create WebSocket.");
     }
 
+    const messages = new WsMessageEmitter(ws);
+
+    const cleanup = setupCoreListeners(messages, update) || undefined;
+
     const state: WsState = {
         ws,
         sendMessage(message: ServerMessage) {
@@ -43,26 +49,27 @@ export function createWsState(
         },
         client: undefined,
         connectedClients: [],
-        messages: new WsMessageEmitter(ws),
+        messages,
+        cleanup,
     };
-
-    setupCoreListeners(state, update);
 
     return state;
 }
 
 function setupCoreListeners(
-    state: WsState,
+    messages: WsMessageEmitter,
     update: Dispatch<SetStateAction<WsState>>,
-) {
-    state.messages.on("Connected", (message) => {
+): (() => void) | void {
+    const connectedListener = (message: ClientMessageOfKind<"Connected">) =>
         update((prev) => ({
             ...prev,
             client: message.client,
         }));
-    });
+    messages.on("Connected", connectedListener);
 
-    state.messages.on("UpdateClient", (message) => {
+    const updateClientListener = (
+        message: ClientMessageOfKind<"UpdateClient">,
+    ) =>
         update((prev) => {
             const connectedClients: Client[] = [];
             let isNewClient = true;
@@ -93,30 +100,10 @@ function setupCoreListeners(
                 connectedClients,
             };
         });
+    messages.on("UpdateClient", updateClientListener);
 
-        //         let existingClientIdx: number | null = null;
-        //         for (let idx = 0; idx < state.connectedClients.length; idx++) {
-        //             if (state.connectedClients[idx].id === message.client.id) {
-        //                 existingClientIdx = idx;
-        //                 break;
-        //             }
-        //         }
-        //         if (existingClientIdx === null) {
-        //             update((prev) => ({
-        //                 ...prev,
-        //                 connectedClients: [...prev.connectedClients, message.client],
-        //             }));
-        //         } else {
-        //             update((prev) => {
-        //                 const connectedClients = [...prev.connectedClients];
-        //                 connectedClients[existingClientIdx as number] = {
-        //                     ...message.client,
-        //                 };
-        //                 return {
-        //                     ...prev,
-        //                     connectedClients,
-        //                 };
-        //             });
-        //         }
-    });
+    return () => {
+        messages.remove("Connected", connectedListener);
+        messages.remove("UpdateClient", updateClientListener);
+    };
 }

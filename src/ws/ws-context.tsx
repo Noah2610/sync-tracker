@@ -16,11 +16,11 @@ export function WsProvider({ children }: WsProviderProps) {
 
     useEffect(() => {
         if (typeof window !== "undefined" && !wsState) {
-            setWsState(
-                createWsState(
-                    setWsState as React.Dispatch<React.SetStateAction<WsState>>,
-                ),
+            const state = createWsState(
+                setWsState as React.Dispatch<React.SetStateAction<WsState>>,
             );
+            setWsState(state);
+            return () => state.cleanup && state.cleanup();
         }
     }, []);
 

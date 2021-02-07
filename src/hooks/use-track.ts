@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { ClientMessageOfKind } from "../../lib/message";
 import Track from "../../lib/track";
 import { updateTrackBeat } from "../../lib/track/update";
-import { ClientMessageOfKind } from "../../lib/message";
 import useWs from "./use-ws";
 
 /**

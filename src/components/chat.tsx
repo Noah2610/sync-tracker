@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Client from "../../lib/client";
+import { ClientMessageOfKind } from "../../lib/message";
 import { useWs } from "../ws/ws-context";
 
 export default function Chat() {
@@ -18,9 +19,10 @@ export default function Chat() {
 
     useEffect(() => {
         if (ws) {
-            ws.messages.on("Message", (message) => {
+            const listener = (message: ClientMessageOfKind<"Message">) =>
                 addMessage(message.client, message.content);
-            });
+            ws.messages.on("Message", listener);
+            return () => ws.messages.remove("Message", listener);
         }
     }, []);
 
