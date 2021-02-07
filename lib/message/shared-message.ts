@@ -7,12 +7,11 @@ import { PatternId, PatternIdSchema } from "../track/pattern";
  */
 type SharedMessage =
     /**
-     * UpdateTrackPart Beat.
-     * Updates a part of the track.
+     * UpdateTrackBeat.
+     * Updates the active state of a specific beat in a track's pattern.
      */
     | {
-          kind: "UpdateTrackPart";
-          part: "Beat";
+          kind: "UpdateTrackBeat";
           patternId: PatternId;
           note: Note;
           step: number;
@@ -25,8 +24,7 @@ type SharedMessage =
 
 export const SharedMessageShema: z.ZodSchema<SharedMessage> = z.union([
     z.object({
-        kind: z.literal("UpdateTrackPart"),
-        part: z.literal("Beat"),
+        kind: z.literal("UpdateTrackBeat"),
         patternId: PatternIdSchema,
         note: NoteSchema,
         step: z.number(),
