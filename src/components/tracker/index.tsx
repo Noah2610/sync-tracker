@@ -1,65 +1,13 @@
-import {
-    createStyles,
-    makeStyles,
-    withStyles,
-    Box,
-    Table as MuiTable,
-    TableBody as MuiTableBody,
-    TableCell as MuiTableCell,
-    TableContainer as MuiTableContainer,
-    TableHead as MuiTableHead,
-    TableRow as MuiTableRow,
-} from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import Track from "../../../lib/track";
 import Pattern, { PatternId } from "../../../lib/track/pattern";
 import useWs from "../../hooks/use-ws";
 import Loading from "../loading";
-
-const useStyles = makeStyles((theme) =>
-    createStyles({
-        noteCell: {
-            backgroundColor: theme.tracker.colors.cells.note.main,
-        },
-        rowEven: {
-            backgroundColor: theme.tracker.colors.cells.even.main,
-        },
-        rowOdd: {
-            backgroundColor: theme.tracker.colors.cells.odd.main,
-        },
-    }),
-);
-
-const Table = withStyles((theme) => ({
-    root: {
-        color: theme.palette.text.primary,
-        fontSize: 20,
-        fontFamily: "Roboto Mono",
-    },
-}))(MuiTable);
-const TableBody = MuiTableBody;
-const TableCell = withStyles((theme) =>
-    createStyles({
-        root: {
-            minWidth: 64,
-            textAlign: "left",
-            borderColor: theme.palette.secondary.main,
-            borderWidth: 1,
-            borderStyle: "solid",
-        },
-    }),
-)(MuiTableCell);
-const TableContainer = MuiTableContainer;
-const TableHead = MuiTableHead;
-const TableRow = withStyles((theme) =>
-    createStyles({
-        root: {},
-    }),
-)(MuiTableRow);
+import TrackerGrid from "./tracker-grid";
 
 export default function Tracker() {
     const ws = useWs();
-    const styles = useStyles();
     const [track, setTrack] = useState<Track | null>(null);
     const [
         selectedPatternId,
@@ -101,38 +49,15 @@ export default function Tracker() {
     console.log(track, selectedPatternId);
 
     return (
-        <>
+        <Box>
             {selectedPattern ? (
-                <TableContainer>
-                    <Table>
-                        <TableBody>
-                            {selectedPattern.notes.map((note, i) => (
-                                <TableRow
-                                    key={i}
-                                    className={
-                                        i % 2 === 0
-                                            ? styles.rowEven
-                                            : styles.rowOdd
-                                    }
-                                >
-                                    <TableCell className={styles.noteCell}>
-                                        {note.note}
-                                    </TableCell>
-                                    {new Array(track.config.patternLen)
-                                        .fill(undefined)
-                                        .map((_, step) => (
-                                            <TableCell
-                                                key={`${i}-${step}`}
-                                            ></TableCell>
-                                        ))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                <TrackerGrid
+                    pattern={selectedPattern}
+                    patternLen={track.config.patternLen}
+                />
             ) : (
                 <>No pattern selected.</>
             )}
-        </>
+        </Box>
     );
 }
