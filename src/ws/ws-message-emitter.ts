@@ -1,8 +1,8 @@
-import { parseClientMessage, ClientMessage } from "../../lib/message";
-
-type ClientMessageOfKind<K extends ClientMessage["kind"]> = ClientMessage & {
-    kind: K;
-};
+import {
+    parseClientMessage,
+    ClientMessage,
+    ClientMessageOfKind,
+} from "../../lib/message";
 
 type WsMessageListener<K extends ClientMessage["kind"]> = (
     message: ClientMessageOfKind<K>,

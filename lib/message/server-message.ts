@@ -1,10 +1,11 @@
 import * as z from "zod";
+import SharedMessage, { SharedMessageShema } from "./shared-message";
 
 /**
  * Message for the server.
  * Sent from a client to the server.
  */
-export type ServerMessage =
+type ServerMessage =
     /**
      * Message.
      * A message sent from a client.
@@ -21,7 +22,14 @@ export type ServerMessage =
     | {
           kind: "UpdateClientName";
           name: string;
-      };
+      }
+    | SharedMessage;
+
+export type ServerMessageOfKind<
+    K extends ServerMessage["kind"]
+> = ServerMessage & {
+    kind: K;
+};
 
 const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
     z.object({
@@ -32,6 +40,7 @@ const ServerMessageSchema: z.ZodSchema<ServerMessage> = z.union([
         kind: z.literal("UpdateClientName"),
         name: z.string(),
     }),
+    SharedMessageShema,
 ]);
 
 /**
@@ -47,3 +56,5 @@ export function parseServerMessage(raw: any): ServerMessage | null {
         return null;
     }
 }
+
+export default ServerMessage;

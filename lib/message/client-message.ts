@@ -1,12 +1,13 @@
 import * as z from "zod";
 import Client, { ClientSchema } from "../client";
 import Track, { TrackSchema } from "../track";
+import SharedMessage, { SharedMessageShema } from "./shared-message";
 
 /**
  * Message for a client.
  * Sent from the server to a client.
  */
-export type ClientMessage =
+type ClientMessage =
     /**
      * Connected.
      * Notifies that the client has successfully connected.
@@ -43,7 +44,14 @@ export type ClientMessage =
     | {
           kind: "UpdateTrack";
           track: Track;
-      };
+      }
+    | SharedMessage;
+
+export type ClientMessageOfKind<
+    K extends ClientMessage["kind"]
+> = ClientMessage & {
+    kind: K;
+};
 
 const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
     z.object({
@@ -64,6 +72,7 @@ const ClientMessageSchema: z.ZodSchema<ClientMessage> = z.union([
         kind: z.literal("UpdateTrack"),
         track: TrackSchema,
     }),
+    SharedMessageShema,
 ]);
 
 /**
@@ -79,3 +88,5 @@ export function parseClientMessage(raw: any): ClientMessage | null {
         return null;
     }
 }
+
+export default ClientMessage;
