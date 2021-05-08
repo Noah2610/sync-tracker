@@ -1,5 +1,6 @@
 import { Box, Button, TextField } from "@material-ui/core";
-import { useSelector, useDispatch, counterActions } from "../store";
+import { useSelector, useDispatch } from "../store";
+import { actions as counterActions } from "../store/counter";
 
 export default function Counter() {
     const count = useSelector((state) => state.counter.value);
