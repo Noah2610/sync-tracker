@@ -1,4 +1,4 @@
-import { Box } from "@material-ui/core";
+import { createStyles, makeStyles, Box } from "@material-ui/core";
 import { useCallback, useEffect, useState } from "react";
 import { PatternId } from "../../../lib/track/pattern";
 import useTrack from "../../hooks/use-track";
@@ -7,7 +7,21 @@ import Loading from "../loading";
 import PatternList from "./pattern-list";
 import TrackerGrid from "./tracker-grid";
 
+const useStyles = makeStyles((theme) =>
+    createStyles({
+        root: {
+            display: "flex",
+            justifyContent: "center",
+        },
+        grid: {},
+        patternList: {
+            width: 128,
+        },
+    }),
+);
+
 export default function Tracker() {
+    const styles = useStyles();
     const ws = useWs();
     const track = useTrack();
     const [
@@ -48,23 +62,27 @@ export default function Tracker() {
             : undefined;
 
     return (
-        <Box>
-            {selectedPattern ? (
-                <TrackerGrid
-                    ws={ws}
-                    pattern={selectedPattern}
-                    patternLen={track.config.patternLen}
-                    barLen={track.config.barLen}
-                />
-            ) : (
-                <>No pattern selected.</>
-            )}
+        <Box className={styles.root}>
+            <Box className={styles.grid}>
+                {selectedPattern ? (
+                    <TrackerGrid
+                        ws={ws}
+                        pattern={selectedPattern}
+                        patternLen={track.config.patternLen}
+                        barLen={track.config.barLen}
+                    />
+                ) : (
+                    <>No pattern selected.</>
+                )}
+            </Box>
 
-            <PatternList
-                patterns={track.patterns}
-                selectedPatternId={selectedPatternId ?? undefined}
-                selectPattern={selectPattern}
-            />
+            <Box className={styles.patternList}>
+                <PatternList
+                    patterns={track.patterns}
+                    selectedPatternId={selectedPatternId ?? undefined}
+                    selectPattern={selectPattern}
+                />
+            </Box>
         </Box>
     );
 }
