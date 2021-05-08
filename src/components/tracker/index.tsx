@@ -7,6 +7,9 @@ import Loading from "../loading";
 import PatternList from "./pattern-list";
 import TrackerGrid from "./tracker-grid";
 
+import { shallowEqual } from "react-redux";
+import { useSelector } from "../../store";
+
 const useStyles = makeStyles((theme) =>
     createStyles({
         root: {
@@ -23,11 +26,16 @@ const useStyles = makeStyles((theme) =>
 export default function Tracker() {
     const styles = useStyles();
     const ws = useWs();
-    const track = useTrack();
+    // const track = useTrack();
     const [
         selectedPatternId,
         setSelectedPatternId,
     ] = useState<PatternId | null>(null);
+
+    const track = useSelector(
+        (state) => state.track.track,
+        shallowEqual, // TODO
+    );
 
     useEffect(() => {
         if (track && selectedPatternId === null) {

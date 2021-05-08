@@ -8,6 +8,9 @@ import GridTableBody from "./grid-table-body";
 import GridTableHead from "./grid-table-head";
 import { Table, TableContainer } from "./styles";
 
+import { useDispatch } from "../../../store";
+import { actions } from "../../../store/track";
+
 export interface TrackerGridProps {
     ws: WsState;
     pattern: Pattern;
@@ -36,17 +39,31 @@ export default function TrackerGrid({
 }: TrackerGridProps) {
     const styles = useStyles({ barLen });
 
+    const dispatch = useDispatch();
     const toggleBeat = useCallback(
         ({ note, step, active }: { note: Note; step: Beat; active: boolean }) =>
-            ws.sendMessage({
-                kind: "UpdateTrackBeat",
-                patternId: pattern.id,
-                note,
-                step,
-                active,
-            }),
+            dispatch(
+                actions.updateTrackBeat({
+                    patternId: pattern.id,
+                    note,
+                    step,
+                    active,
+                }),
+            ),
         [pattern.id],
     );
+
+    // const toggleBeat = useCallback(
+    //     ({ note, step, active }: { note: Note; step: Beat; active: boolean }) =>
+    //         ws.sendMessage({
+    //             kind: "UpdateTrackBeat",
+    //             patternId: pattern.id,
+    //             note,
+    //             step,
+    //             active,
+    //         }),
+    //     [pattern.id],
+    // );
 
     return (
         <TableContainer>

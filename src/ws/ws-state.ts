@@ -59,7 +59,7 @@ export function createWsState(
 function setupCoreListeners(
     messages: WsMessageEmitter,
     update: Dispatch<SetStateAction<WsState>>,
-): (() => void) | void {
+): () => void {
     const connectedListener = (message: ClientMessageOfKind<"Connected">) =>
         update((prev) => ({
             ...prev,
