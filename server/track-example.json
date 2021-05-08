@@ -43,7 +43,7 @@
             "instrument": {
                 "instrument": "Synth",
                 "options": {
-                    "volume": 50
+                    "volume": 20
                 }
             }
         },
@@ -67,7 +67,7 @@
             "instrument": {
                 "instrument": "NoiseSynth",
                 "options": {
-                    "volume": 50,
+                    "volume": 20,
                     "noise": {
                         "type": "white"
                     }
