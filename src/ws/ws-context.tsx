@@ -12,7 +12,7 @@ export interface WsProviderProps {
 }
 
 export function WsProvider({ children }: WsProviderProps) {
-    const [wsState, setWsState] = useState<WsState | null>(null);
+    const [wsState, setWsState] = useState<WsState>();
 
     useEffect(() => {
         if (typeof window !== "undefined" && !wsState) {

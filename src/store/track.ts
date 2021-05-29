@@ -50,16 +50,4 @@ const trackSlice = createSlice({
 
 export const actions = trackSlice.actions;
 
-// export function setupWs(store: Store) {
-//     const update: Dispatch<SetStateAction<WsState>> = (setter) => {
-//         const newWsState =
-//             typeof setter === "function"
-//                 ? setter(store.getState().track.wsState!)
-//                 : setter;
-//         store.dispatch(actions.setWsState(newWsState));
-//     };
-//     const wsState = createWsState(update);
-//     store.dispatch(actions.setWsState(wsState));
-// }
-
 export default trackSlice;

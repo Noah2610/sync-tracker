@@ -7,6 +7,7 @@ import { Provider as StoreProvider } from "react-redux";
 import Navigation from "../components/navigation";
 import muiTheme from "../theme";
 import { WsProvider } from "../ws/ws-context";
+import SyncWsToStore from "../components/sync-ws-to-store";
 import store from "../store";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -23,17 +24,18 @@ export default function App({ Component, pageProps }: AppProps) {
                     href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100;400;700&family=Roboto:wght@100;400;900&display=swap"
                 />
             </Head>
-            <StoreProvider store={store}>
-                <ThemeProvider theme={muiTheme}>
-                    <CssBaseline />
+            <ThemeProvider theme={muiTheme}>
+                <CssBaseline />
+                <StoreProvider store={store}>
                     <WsProvider>
+                        <SyncWsToStore />
                         <Navigation />
                         <Container maxWidth="md">
                             <Component {...pageProps} />
                         </Container>
                     </WsProvider>
-                </ThemeProvider>
-            </StoreProvider>
+                </StoreProvider>
+            </ThemeProvider>
         </>
     );
 }

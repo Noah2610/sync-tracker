@@ -1,8 +1,4 @@
-import {
-    configureStore,
-    combineReducers,
-    Store as ReduxStore,
-} from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import {
     useDispatch as useReduxDispatch,
     useSelector as useReduxSelector,
@@ -13,10 +9,10 @@ import counter from "./counter";
 import track from "./track";
 
 const store = configureStore({
-    reducer: combineReducers({
+    reducer: {
         counter: counter.reducer,
         track: track.reducer,
-    }),
+    },
 });
 
 export type Dispatch = typeof store.dispatch;
@@ -26,5 +22,10 @@ export type Store = typeof store;
 export const useDispatch = () => useReduxDispatch<Dispatch>();
 export const useSelector: TypedUseSelectorHook<State> = useReduxSelector;
 export const useStore = () => useReduxStore<State>();
+
+export const actions = {
+    counter: counter.actions,
+    track: track.actions,
+};
 
 export default store;

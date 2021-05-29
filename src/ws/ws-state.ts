@@ -29,9 +29,11 @@ function createWs(): WebSocket | null {
     return ws;
 }
 
-export function createWsState(
-    update: Dispatch<SetStateAction<WsState>>,
-): WsState {
+export type SetWsState = (
+    setter: ((wsState: WsState) => WsState) | WsState,
+) => void;
+
+export function createWsState(setWsState: SetWsState): WsState {
     const ws = createWs();
 
     if (!ws) {
@@ -40,7 +42,7 @@ export function createWsState(
 
     const messages = new WsMessageEmitter(ws);
 
-    const cleanup = setupCoreListeners(messages, update) || undefined;
+    const cleanup = setupCoreListeners(messages, setWsState) || undefined;
 
     const state: WsState = {
         ws,
@@ -58,10 +60,10 @@ export function createWsState(
 
 function setupCoreListeners(
     messages: WsMessageEmitter,
-    update: Dispatch<SetStateAction<WsState>>,
+    setWsState: SetWsState,
 ): () => void {
     const connectedListener = (message: ClientMessageOfKind<"Connected">) =>
-        update((prev) => ({
+        setWsState((prev) => ({
             ...prev,
             client: message.client,
         }));
@@ -70,7 +72,7 @@ function setupCoreListeners(
     const updateClientListener = (
         message: ClientMessageOfKind<"UpdateClient">,
     ) =>
-        update((prev) => {
+        setWsState((prev) => {
             const connectedClients: Client[] = [];
             let isNewClient = true;
 
