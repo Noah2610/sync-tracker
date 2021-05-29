@@ -2,6 +2,7 @@
     "compilerOptions": {
         "target": "ES5",
         "lib": ["dom", "dom.iterable", "esnext"],
+        "sourceMap": true,
         "allowJs": false,
         "skipLibCheck": true,
         "strict": true,
@@ -15,6 +16,7 @@
         "jsx": "preserve",
         "noImplicitAny": true,
         "strictNullChecks": true,
+        "noUncheckedIndexedAccess": true,
         "baseUrl": "."
     },
     "include": [
