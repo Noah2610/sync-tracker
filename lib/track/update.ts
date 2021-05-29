@@ -1,3 +1,4 @@
+import produce from "immer";
 import Track from ".";
 import { SharedMessageOfKind } from "../message";
 
@@ -12,29 +13,32 @@ export function updateTrackBeat(
     track: Track,
     message: SharedMessageOfKind<"UpdateTrackBeat">,
 ): { track: Track; didUpdate: boolean } {
-    const newTrack = { ...track };
     let didUpdate = false;
-    const { patternId, note, step, active } = message;
-    const pattern = newTrack.patterns.find((pat) => pat.id === patternId);
-    if (pattern) {
-        const patternNote = pattern.notes.find((n) => n.note === note);
-        if (patternNote) {
-            const alreadyActive = patternNote.beats.includes(step);
-            if (active && !alreadyActive) {
-                patternNote.beats.push(step);
-                didUpdate = true;
-            } else if (!active && alreadyActive) {
-                const idx = patternNote.beats.indexOf(step);
-                if (idx !== -1) {
-                    patternNote.beats.splice(idx, 1);
+    const newTrack = produce(track, (track) => {
+        const { patternId, note, step, active } = message;
+        const pattern = track.patterns.find((pat) => pat.id === patternId);
+        if (pattern) {
+            const patternNote = pattern.notes.find((n) => n.note === note);
+            if (patternNote) {
+                const alreadyActive = patternNote.beats.includes(step);
+                if (active && !alreadyActive) {
+                    patternNote.beats.push(step);
+                    didUpdate = true;
+                } else if (!active && alreadyActive) {
+                    const idx = patternNote.beats.indexOf(step);
+                    if (idx !== -1) {
+                        patternNote.beats.splice(idx, 1);
+                    }
+                    didUpdate = true;
                 }
-                didUpdate = true;
+            } else {
+                console.error(
+                    `Note ${note} in pattern ${patternId} not found.`,
+                );
             }
         } else {
-            console.error(`Note ${note} in pattern ${patternId} not found.`);
+            console.error(`Pattern with PatternId ${patternId} not found.`);
         }
-    } else {
-        console.error(`Pattern with PatternId ${patternId} not found.`);
-    }
+    });
     return { track: newTrack, didUpdate };
 }
