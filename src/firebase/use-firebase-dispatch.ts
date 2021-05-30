@@ -1,4 +1,6 @@
-import { firestore } from ".";
+import { useMemo } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { firestore, auth } from ".";
 import {
     DocumentReference,
     DocTrack,
@@ -49,65 +51,54 @@ export interface FirebaseDispatch {
 }
 
 export default function useFirebaseDispatch(): FirebaseDispatch {
-    return {
-        setTrack({ id, doc }: { id: TrackId; doc: DocTrack }) {
-            return (
-                firestore.doc(`/tracks/${id}`) as DocumentReference<DocTrack>
-            ).set(doc);
-        },
+    const userEmail = useAuthState(auth)[0]?.email;
 
-        setPattern({
-            id,
-            trackId,
-            doc,
-        }: {
-            id: PatternId;
-            trackId: TrackId;
-            doc: DocPattern;
-        }) {
-            return (
-                firestore.doc(
-                    `/tracks/${trackId}/patterns/${id}`,
-                ) as DocumentReference<DocPattern>
-            ).set(doc);
-        },
+    const dispatch: FirebaseDispatch = useMemo(() => {
+        if (!userEmail) {
+            const reject = () => Promise.reject("No user email");
+            return {
+                setTrack: reject,
+                setPattern: reject,
+                setNote: reject,
+                setBeat: reject,
+            };
+        }
 
-        setNote({
-            id,
-            trackId,
-            patternId,
-            doc,
-        }: {
-            id: NoteId;
-            trackId: TrackId;
-            patternId: PatternId;
-            doc: DocNote;
-        }) {
-            return (
-                firestore.doc(
-                    `/tracks/${trackId}/patterns/${patternId}/notes/${id}`,
-                ) as DocumentReference<DocNote>
-            ).set(doc);
-        },
+        const baseRef = `/users/${userEmail}`;
+        return {
+            setTrack({ id, doc }) {
+                return (
+                    firestore.doc(
+                        `${baseRef}/tracks/${id}`,
+                    ) as DocumentReference<DocTrack>
+                ).set(doc);
+            },
 
-        setBeat({
-            id,
-            trackId,
-            patternId,
-            noteId,
-            doc,
-        }: {
-            id: BeatId;
-            trackId: TrackId;
-            patternId: PatternId;
-            noteId: NoteId;
-            doc: DocBeat;
-        }) {
-            return (
-                firestore.doc(
-                    `/tracks/${trackId}/patterns/${patternId}/notes/${noteId}/beats/${id}`,
-                ) as DocumentReference<DocBeat>
-            ).set(doc);
-        },
-    };
+            setPattern({ id, trackId, doc }) {
+                return (
+                    firestore.doc(
+                        `${baseRef}/tracks/${trackId}/patterns/${id}`,
+                    ) as DocumentReference<DocPattern>
+                ).set(doc);
+            },
+
+            setNote({ id, trackId, patternId, doc }) {
+                return (
+                    firestore.doc(
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/notes/${id}`,
+                    ) as DocumentReference<DocNote>
+                ).set(doc);
+            },
+
+            setBeat({ id, trackId, patternId, noteId, doc }) {
+                return (
+                    firestore.doc(
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/notes/${noteId}/beats/${id}`,
+                    ) as DocumentReference<DocBeat>
+                ).set(doc);
+            },
+        };
+    }, [userEmail]);
+
+    return dispatch;
 }

@@ -24,7 +24,7 @@ const useStyles = makeStyles((_theme) =>
 const selector = (state: State) => ({
     trackConfig: state.track.track?.config,
     trackId: state.track.selectedTrackId,
-    patternId: state.track.selectedTrackId,
+    patternId: state.track.selectedPatternId,
     pattern: state.track.selectedPatternId
         ? state.track.patterns[state.track.selectedPatternId]
         : undefined,
@@ -61,15 +61,17 @@ export default function TrackerGrid() {
             active: boolean;
         }) => {
             if (trackId !== undefined && patternId !== undefined) {
-                firebaseDispatch.setBeat({
-                    id: step,
-                    trackId,
-                    patternId,
-                    noteId: note,
-                    doc: {
-                        isActive: active,
-                    },
-                });
+                firebaseDispatch
+                    .setBeat({
+                        id: step,
+                        trackId,
+                        patternId,
+                        noteId: note,
+                        doc: {
+                            isActive: active,
+                        },
+                    })
+                    .catch(console.error);
             } else {
                 console.error(
                     "Can't update firebase beat because trackId or patternId aren't set",

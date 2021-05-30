@@ -173,13 +173,10 @@ export default function SyncFirebaseToStore() {
             selectedTrackId !== undefined &&
             patternIds.length > 0
         ) {
-            console.log("Update BEATS");
-
             const unsubscribes: (() => void)[] = [];
 
             for (const patternId of patternIds) {
                 for (const noteId of patternNoteIds[patternId] || []) {
-                    console.log(`${patternId}-${noteId}`);
                     const unsubscribe = (
                         firestore.collection(
                             `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/notes/${noteId}/beats`,
