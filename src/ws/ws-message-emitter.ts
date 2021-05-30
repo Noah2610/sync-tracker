@@ -22,6 +22,7 @@ export default class WsMessageEmitter {
     constructor(ws: WebSocket) {
         this.ws = ws;
         this.events = {};
+        this.reconnectTimeout = null;
 
         this.setupWsListener();
     }
@@ -62,6 +63,11 @@ export default class WsMessageEmitter {
         );
     }
 
+    public setWs(ws: WebSocket) {
+        this.ws = ws;
+        this.setupWsListener();
+    }
+
     private getEventsOfKind<K extends ClientMessage["kind"]>(
         kind: K,
     ): WsMessageListener<K>[] {
@@ -72,6 +78,10 @@ export default class WsMessageEmitter {
     }
 
     private setupWsListener() {
+        this.ws.addEventListener("open", (event) => {
+            console.log("Connected to WebSocket!");
+        });
+
         this.ws.addEventListener("message", (event) => {
             if (event.data) {
                 const message = parseClientMessage(event.data);
@@ -80,6 +90,7 @@ export default class WsMessageEmitter {
                     message.kind &&
                     Object.keys(this.events).includes(message.kind)
                 ) {
+                    console.log("[INCOMING WS MESSAGE]", message.kind);
                     this.emit(message);
                 } else {
                     console.error("Unknown ClientMessage", message);
@@ -88,7 +99,7 @@ export default class WsMessageEmitter {
         });
 
         this.ws.addEventListener("close", (event) => {
-            console.log(
+            console.warn(
                 `WebSocket connection closed: ${event.code} ${event.reason}`,
             );
             this.cleanup();

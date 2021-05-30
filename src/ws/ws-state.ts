@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import produce from "immer";
 import Client from "../../lib/client";
 import { ServerMessage, ClientMessageOfKind } from "../../lib/message";
 import WsMessageEmitter from "./ws-message-emitter";
@@ -14,19 +15,11 @@ export default interface WsState {
     messages: WsMessageEmitter;
 
     cleanup?: () => void;
+    reconnectTimeout?: NodeJS.Timeout;
 }
 
-function createWs(): WebSocket | null {
-    let ws: WebSocket | null = null;
-
-    try {
-        ws = new WebSocket(WS_URL);
-    } catch (e) {
-        console.error(e);
-        return null;
-    }
-
-    return ws;
+function createWs(): WebSocket {
+    return new WebSocket(WS_URL);
 }
 
 export type SetWsState = (
@@ -36,13 +29,11 @@ export type SetWsState = (
 export function createWsState(setWsState: SetWsState): WsState {
     const ws = createWs();
 
-    if (!ws) {
-        throw new Error("Couldn't create WebSocket.");
-    }
-
     const messages = new WsMessageEmitter(ws);
 
     const cleanup = setupCoreListeners(messages, setWsState) || undefined;
+
+    setupWsReconnection(ws, setWsState);
 
     const state: WsState = {
         ws,
@@ -108,4 +99,40 @@ function setupCoreListeners(
         messages.remove("Connected", connectedListener);
         messages.remove("UpdateClient", updateClientListener);
     };
+}
+
+function setupWsReconnection(ws: WebSocket, setWsState: SetWsState) {
+    const RECONNECT_DELAY_MS = 2000;
+
+    const reconnect = () => {
+        setWsState((base) =>
+            produce(base, (state) => {
+                state.reconnectTimeout = undefined;
+                const ws = createWs();
+                state.ws = ws;
+                state.messages.setWs(ws);
+                setupWsReconnection(ws, setWsState);
+            }),
+        );
+    };
+
+    ws.addEventListener("close", (event) => {
+        setWsState((base) =>
+            produce(base, (state) => {
+                // state.reconnectTimeout = setTimeout();
+                console.warn(
+                    `WebSocket connection closed, attempting to reconnect in ${
+                        RECONNECT_DELAY_MS / 1000
+                    } seconds`,
+                );
+                if (state.reconnectTimeout) {
+                    clearTimeout(state.reconnectTimeout);
+                }
+                state.reconnectTimeout = setTimeout(
+                    reconnect,
+                    RECONNECT_DELAY_MS,
+                );
+            }),
+        );
+    });
 }
