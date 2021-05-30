@@ -1,11 +1,4 @@
-import {
-    Pattern,
-    Note,
-    Notes,
-    NoteId,
-    Beat,
-    BeatId,
-} from "../../../store/types";
+import { Pattern, Notes, NoteId, BeatId } from "../../../store/types";
 import BeatCell from "./beat-cell";
 import NoteCell from "./note-cell";
 import { BeatTableRow, TableBody } from "./styles";
@@ -16,12 +9,12 @@ export interface GridTableBodyProps {
     patternLen: number;
     toggleBeat: ({
         note,
-        step,
-        active,
+        beat,
+        isActive,
     }: {
         note: NoteId;
-        step: BeatId;
-        active: boolean;
+        beat: BeatId;
+        isActive: boolean;
     }) => void;
     cellClassName?: string;
 }
@@ -51,21 +44,16 @@ export default function GridTableBody({
                     />
                     {Array.from({ length: patternLen }, (_, step) => {
                         const beatId = step;
-                        const beat = pattern.notes[note]!.beats[beatId];
-                        const isActive = beat?.isActive || false;
+                        const toggle = (isActive: boolean) =>
+                            toggleBeat({ beat: beatId, note, isActive });
                         return (
                             <BeatCell
                                 key={`${i}-${beatId}`}
                                 className={cellClassName}
                                 component="td"
-                                isActive={isActive}
-                                toggle={() =>
-                                    toggleBeat({
-                                        note: note,
-                                        step,
-                                        active: !isActive,
-                                    })
-                                }
+                                beat={beatId}
+                                note={note}
+                                toggle={toggle}
                             />
                         );
                     })}

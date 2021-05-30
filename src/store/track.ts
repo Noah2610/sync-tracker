@@ -131,7 +131,7 @@ const trackSlice = createSlice({
                 const note = pattern.notes[noteId];
                 if (note) {
                     for (const beatIdS in beats) {
-                        const beatId = parseInt(beatIdS) || -1;
+                        const beatId = parseInt(beatIdS) ?? -1;
                         const beat = beats[beatId];
                         if (beat) {
                             note.beats[beatId] = beat;

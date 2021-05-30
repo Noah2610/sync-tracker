@@ -53,22 +53,22 @@ export default function TrackerGrid() {
     const toggleBeat = useCallback(
         ({
             note,
-            step,
-            active,
+            beat,
+            isActive,
         }: {
             note: NoteId;
-            step: BeatId;
-            active: boolean;
+            beat: BeatId;
+            isActive: boolean;
         }) => {
             if (trackId !== undefined && patternId !== undefined) {
                 firebaseDispatch
                     .setBeat({
-                        id: step,
+                        id: beat,
                         trackId,
                         patternId,
                         noteId: note,
                         doc: {
-                            isActive: active,
+                            isActive,
                         },
                     })
                     .catch(console.error);
