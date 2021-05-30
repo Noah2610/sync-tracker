@@ -15,6 +15,7 @@ import {
     ConnectedClients,
 } from "../client";
 import Loading from "../loading";
+import Auth from "../user/auth";
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
@@ -35,19 +36,21 @@ export default function Navigation() {
             <AppBar position="relative">
                 <Container maxWidth="md">
                     <Toolbar className={styles.toolbar}>
-                        <ConnectedClients />
-                        <Box>
-                            {ws && ws.client ? (
-                                <Button
-                                    variant="text"
-                                    onClick={toggleClientMenu}
-                                >
-                                    <ClientName client={ws.client} />
-                                </Button>
-                            ) : (
-                                <Loading />
-                            )}
-                        </Box>
+                        <Auth />
+                        {/*
+                            <Box>
+                                {ws && ws.client ? (
+                                    <Button
+                                        variant="text"
+                                        onClick={toggleClientMenu}
+                                    >
+                                        <ClientName client={ws.client} />
+                                    </Button>
+                                ) : (
+                                    <Loading />
+                                )}
+                            </Box>
+                        */}
                     </Toolbar>
                 </Container>
             </AppBar>
