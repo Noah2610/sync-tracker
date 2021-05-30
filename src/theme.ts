@@ -1,6 +1,5 @@
 import purple from "@material-ui/core/colors/purple";
 import { createMuiTheme } from "@material-ui/core/styles";
-import { PaletteOptions } from "@material-ui/core/styles/createPalette";
 
 type CssColor = React.CSSProperties["color"];
 
@@ -30,11 +29,7 @@ declare module "@material-ui/core/styles/createMuiTheme" {
     }
 }
 
-interface Colors {
-    [name: string]: string;
-}
-
-const COLORS: Colors = {
+const COLORS = {
     primary: "#315781",
     secondary: purple[500],
     background: "#282c34",
@@ -76,7 +71,7 @@ export default createMuiTheme({
                 },
                 active: {
                     main: COLORS.secondary,
-                }
+                },
             },
         },
     },
