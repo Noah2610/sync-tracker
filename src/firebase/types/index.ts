@@ -22,8 +22,11 @@ export interface DocPattern {
     order: number;
 }
 
+export interface DocNote {
+    order: number;
+}
+
 export interface DocBeat {
     beat: Beat;
-    note: Note;
     isActive: boolean;
 }

@@ -4,8 +4,11 @@ import {
     TrackId,
     Patterns,
     PatternId,
-    Beats,
+    Note,
+    Notes,
+    NoteId,
     Beat,
+    Beats,
     BeatId,
 } from "./types";
 
@@ -49,21 +52,48 @@ const trackSlice = createSlice({
             state.patterns = payload;
         },
 
-        setPatternBeats(
+        setPatternNotes(
             state,
             {
-                payload: { patternId, beats },
+                payload: { patternId, notes },
             }: PayloadAction<{
                 patternId: PatternId;
-                beats: Beats;
+                notes: Notes;
             }>,
         ) {
             const pattern = state.patterns[patternId];
             if (pattern) {
-                pattern.beats = beats;
+                pattern.notes = notes;
             } else {
                 console.error(
-                    `Can't set beats for pattern ${patternId} because pattern doesn't exist`,
+                    `Can't set notes for pattern ${patternId} because pattern doesn't exist`,
+                );
+            }
+        },
+
+        updatePatternNotes(
+            state,
+            {
+                payload: { patternId, notes },
+            }: PayloadAction<{
+                patternId: PatternId;
+                notes: { [note in NoteId]?: Note | null };
+            }>,
+        ) {
+            const pattern = state.patterns[patternId];
+            if (pattern) {
+                let noteId: NoteId;
+                for (noteId in notes) {
+                    const note = notes[noteId] as Note | null;
+                    if (note) {
+                        pattern.notes[noteId] = note;
+                    } else {
+                        delete pattern.notes[noteId];
+                    }
+                }
+            } else {
+                console.error(
+                    `Can't update notes for pattern ${patternId} because pattern doesn't exist`,
                 );
             }
         },
@@ -71,21 +101,28 @@ const trackSlice = createSlice({
         updatePatternBeats(
             state,
             {
-                payload: { patternId, beats },
+                payload: { patternId, noteId, beats },
             }: PayloadAction<{
                 patternId: PatternId;
+                noteId: NoteId;
                 beats: Record<BeatId, Beat | null>;
             }>,
         ) {
             const pattern = state.patterns[patternId];
             if (pattern) {
-                for (const beatId of Object.keys(beats)) {
-                    const beat = beats[beatId] as Beat | null;
-                    if (beat) {
-                        pattern.beats[beatId] = beat;
-                    } else {
-                        delete pattern.beats[beatId];
+                const note = pattern.notes[noteId];
+                if (note) {
+                    for (const beatId of Object.keys(beats)) {
+                        const beat = beats[beatId] as Beat | null;
+                        if (beat) {
+                            note.beats[beatId] = beat;
+                        } else {
+                            delete note.beats[beatId];
+                        }
                     }
+                    console.error(
+                        `Can't update beats for note ${noteId} in pattern ${patternId} because note doesn't exist`,
+                    );
                 }
             } else {
                 console.error(
