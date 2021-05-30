@@ -1,8 +1,8 @@
-import { IconButton } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import Loading from "../loading";
-import Avatar from "./avatar";
+import ClientName from "../client/name";
 import Login from "./login";
 
 const logout = () => auth.signOut();
@@ -19,9 +19,12 @@ export default function Auth() {
     }
 
     return user ? (
-        <IconButton onClick={logout}>
-            <Avatar user={user} />
-        </IconButton>
+        <Button variant="text" onClick={logout}>
+            <ClientName
+                name={user.displayName || "USER"}
+                avatarSrc={user.photoURL || undefined}
+            />
+        </Button>
     ) : (
         <Login />
     );

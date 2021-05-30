@@ -3,13 +3,11 @@ import { useCallback, useEffect } from "react";
 import Beat from "../../../../lib/track/beat";
 import Note from "../../../../lib/track/note";
 import Pattern from "../../../../lib/track/pattern";
-import WsState from "../../../ws/ws-state";
 import GridTableBody from "./grid-table-body";
 import GridTableHead from "./grid-table-head";
 import { Table, TableContainer } from "./styles";
 
 export interface TrackerGridProps {
-    ws: WsState;
     pattern: Pattern;
     patternLen: number;
     barLen: number;
@@ -29,24 +27,33 @@ const useStyles = makeStyles((_theme) =>
 );
 
 export default function TrackerGrid({
-    ws,
     pattern,
     patternLen,
     barLen,
 }: TrackerGridProps) {
     const styles = useStyles({ barLen });
 
-    const toggleBeat = useCallback(
-        ({ note, step, active }: { note: Note; step: Beat; active: boolean }) =>
-            ws.sendMessage({
-                kind: "UpdateTrackBeat",
-                patternId: pattern.id,
-                note,
-                step,
-                active,
-            }),
-        [pattern.id],
-    );
+    const toggleBeat = ({
+        note,
+        step,
+        active,
+    }: {
+        note: Note;
+        step: Beat;
+        active: boolean;
+    }) => console.log(`Toggle beat: ${note} at ${step} to ${active}`);
+
+    // const toggleBeat = useCallback(
+    //     ({ note, step, active }: { note: Note; step: Beat; active: boolean }) =>
+    //         ws.sendMessage({
+    //             kind: "UpdateTrackBeat",
+    //             patternId: pattern.id,
+    //             note,
+    //             step,
+    //             active,
+    //         }),
+    //     [pattern.id],
+    // );
 
     return (
         <TableContainer>

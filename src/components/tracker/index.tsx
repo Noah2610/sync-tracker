@@ -1,8 +1,7 @@
 import { createStyles, makeStyles, Box } from "@material-ui/core";
 import { useCallback, useEffect, useState } from "react";
+import Track from "../../../lib/track";
 import { PatternId } from "../../../lib/track/pattern";
-import useTrack from "../../hooks/use-track";
-import useWs from "../../hooks/use-ws";
 import Loading from "../loading";
 import PatternList from "./pattern-list";
 import TrackerGrid from "./tracker-grid";
@@ -22,12 +21,10 @@ const useStyles = makeStyles((theme) =>
 
 export default function Tracker() {
     const styles = useStyles();
-    const ws = useWs();
-    const track = useTrack();
-    const [
-        selectedPatternId,
-        setSelectedPatternId,
-    ] = useState<PatternId | null>(null);
+    const [selectedPatternId, setSelectedPatternId] =
+        useState<PatternId | null>(null);
+
+    const track = null as Track | null;
 
     useEffect(() => {
         if (track && selectedPatternId === null) {
@@ -42,10 +39,6 @@ export default function Tracker() {
         (patternId: PatternId) => setSelectedPatternId(patternId),
         [],
     );
-
-    if (!ws) {
-        return <Loading />;
-    }
 
     if (!track) {
         return (
@@ -66,7 +59,6 @@ export default function Tracker() {
             <Box className={styles.grid}>
                 {selectedPattern ? (
                     <TrackerGrid
-                        ws={ws}
                         pattern={selectedPattern}
                         patternLen={track.config.patternLen}
                         barLen={track.config.barLen}

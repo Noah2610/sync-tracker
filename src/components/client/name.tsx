@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
     createStyles,
     makeStyles,
@@ -6,11 +7,10 @@ import {
     Tooltip,
     Typography,
 } from "@material-ui/core";
-import Client from "../../../lib/client";
-import Loading from "../loading";
 
 export interface ClientNameProps {
-    client: Client;
+    avatarSrc?: string;
+    name: string;
     size?: "normal" | "small";
 }
 
@@ -60,7 +60,8 @@ const useAvatarStyles = makeStyles({
 });
 
 export default function ClientName({
-    client,
+    avatarSrc,
+    name,
     size = "normal",
 }: ClientNameProps) {
     const styles = useStyles();
@@ -79,39 +80,39 @@ export default function ClientName({
         }
     }
 
-    const avatarLetters =
-        client.name &&
-        client.name
-            .split(" ")
-            .map((word) => word[0])
-            .join("")
-            .slice(0, 2);
+    const avatarLetters = useMemo(
+        () =>
+            avatarSrc
+                ? null
+                : name
+                      .split(" ")
+                      .map((word) => word[0])
+                      .join("")
+                      .slice(0, 2),
+        [name, avatarSrc],
+    );
 
     return (
         <>
-            {client.name && avatarLetters ? (
-                <Tooltip
-                    title={
-                        <Typography className={styles.name}>
-                            {client.name}
-                        </Typography>
-                    }
-                >
-                    <Box className={styles.wrapper} width={width}>
-                        <Avatar className={avatarStyles[size]}>
-                            {avatarLetters}
-                        </Avatar>
-                        <Typography
-                            className={`${styles.name} ${nameStyles[size]}`}
-                            noWrap
-                        >
-                            {client.name}
-                        </Typography>
-                    </Box>
-                </Tooltip>
-            ) : (
-                <Loading />
-            )}
+            <Tooltip
+                title={<Typography className={styles.name}>{name}</Typography>}
+            >
+                <Box className={styles.wrapper} width={width}>
+                    <Avatar
+                        className={avatarStyles[size]}
+                        src={avatarSrc}
+                        alt={name}
+                    >
+                        {avatarLetters}
+                    </Avatar>
+                    <Typography
+                        className={`${styles.name} ${nameStyles[size]}`}
+                        noWrap
+                    >
+                        {name}
+                    </Typography>
+                </Box>
+            </Tooltip>
         </>
     );
 }

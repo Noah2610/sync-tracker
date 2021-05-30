@@ -5,7 +5,6 @@ import { ThemeProvider } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Navigation from "../components/navigation";
 import muiTheme from "../theme";
-import { WsProvider } from "../ws/ws-context";
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
@@ -24,12 +23,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
             <ThemeProvider theme={muiTheme}>
                 <CssBaseline />
-                <WsProvider>
-                    <Navigation />
-                    <Container maxWidth="md">
-                        <Component {...pageProps} />
-                    </Container>
-                </WsProvider>
+                <Navigation />
+                <Container maxWidth="md">
+                    <Component {...pageProps} />
+                </Container>
             </ThemeProvider>
         </>
     );
