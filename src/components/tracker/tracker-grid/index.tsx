@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { shallowEqual } from "react-redux";
 import { createStyles, makeStyles } from "@material-ui/core";
-import { actions, useDispatch, useSelector, State } from "../../../store";
-import { Pattern, BeatId, Note, NoteId } from "../../../store/types/pattern";
+import { useSelector, State } from "../../../store";
+import { BeatId, NoteId } from "../../../store/types/pattern";
+import useFirebaseDispatch from "../../../firebase/use-firebase-dispatch";
 import GridTableBody from "./grid-table-body";
 import GridTableHead from "./grid-table-head";
 import { Table, TableContainer } from "./styles";
@@ -22,6 +23,7 @@ const useStyles = makeStyles((_theme) =>
 
 const selector = (state: State) => ({
     trackConfig: state.track.track?.config,
+    trackId: state.track.selectedTrackId,
     patternId: state.track.selectedTrackId,
     pattern: state.track.selectedPatternId
         ? state.track.patterns[state.track.selectedPatternId]
@@ -39,34 +41,43 @@ const selectorEqual = (a: SelectorReturn, b: SelectorReturn) =>
     shallowEqual(a.trackConfig, b.trackConfig);
 
 export default function TrackerGrid() {
-    const { trackConfig, patternId, pattern } = useSelector(
+    const { trackConfig, trackId, patternId, pattern } = useSelector(
         selector,
         selectorEqual,
     );
 
     const styles = useStyles({ barLen: trackConfig?.barLen ?? 4 });
 
-    const toggleBeat = ({
-        note,
-        step,
-        active,
-    }: {
-        note: NoteId;
-        step: BeatId;
-        active: boolean;
-    }) => console.log(`Toggle beat: ${note} at ${step} to ${active}`);
+    const firebaseDispatch = useFirebaseDispatch();
 
-    // const toggleBeat = useCallback(
-    //     ({ note, step, active }: { note: Note; step: Beat; active: boolean }) =>
-    //         ws.sendMessage({
-    //             kind: "UpdateTrackBeat",
-    //             patternId: pattern.id,
-    //             note,
-    //             step,
-    //             active,
-    //         }),
-    //     [pattern.id],
-    // );
+    const toggleBeat = useCallback(
+        ({
+            note,
+            step,
+            active,
+        }: {
+            note: NoteId;
+            step: BeatId;
+            active: boolean;
+        }) => {
+            if (trackId !== undefined && patternId !== undefined) {
+                firebaseDispatch.setBeat({
+                    id: step,
+                    trackId,
+                    patternId,
+                    noteId: note,
+                    doc: {
+                        isActive: active,
+                    },
+                });
+            } else {
+                console.error(
+                    "Can't update firebase beat because trackId or patternId aren't set",
+                );
+            }
+        },
+        [trackId, patternId],
+    );
 
     if (!trackConfig || !pattern) {
         return null;

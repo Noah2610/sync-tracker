@@ -1,8 +1,6 @@
 import firebase from "firebase";
 import Track from "../../../lib/track";
 import Pattern from "../../../lib/track/pattern";
-import Beat from "../../../lib/track/beat";
-import Note from "../../../lib/track/note";
 
 export type CollectionReference<T> = firebase.firestore.CollectionReference<T>;
 export type DocumentReference<T> = firebase.firestore.DocumentReference<T>;
