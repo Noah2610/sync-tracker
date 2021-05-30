@@ -1,17 +1,11 @@
 import { useCallback, useEffect } from "react";
+import { shallowEqual } from "react-redux";
 import { createStyles, makeStyles } from "@material-ui/core";
-import Beat from "../../../../lib/track/beat";
-import Note from "../../../../lib/track/note";
-import Pattern from "../../../../lib/track/pattern";
+import { actions, useDispatch, useSelector, State } from "../../../store";
+import { Pattern, Beat, Note } from "../../../store/types/pattern";
 import GridTableBody from "./grid-table-body";
 import GridTableHead from "./grid-table-head";
 import { Table, TableContainer } from "./styles";
-
-export interface TrackerGridProps {
-    pattern: Pattern;
-    patternLen: number;
-    barLen: number;
-}
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
@@ -26,12 +20,28 @@ const useStyles = makeStyles((_theme) =>
     }),
 );
 
-export default function TrackerGrid({
-    pattern,
-    patternLen,
-    barLen,
-}: TrackerGridProps) {
-    const styles = useStyles({ barLen });
+const selector = (state: State) => ({
+    trackConfig: state.track.track?.config,
+    patternId: state.track.selectedTrackId,
+    pattern: state.track.selectedPatternId
+        ? state.track.patterns[state.track.selectedPatternId]
+        : undefined,
+});
+
+type SelectorReturn = ReturnType<typeof selector>;
+
+const selectorEqual = (a: SelectorReturn, b: SelectorReturn) =>
+    a.patternId === b.patternId &&
+    // shallowEqual(Object.keys(a.pattern.notes), Object.keys(b.pattern.notes)) && // TODO
+    shallowEqual(a.trackConfig, b.trackConfig);
+
+export default function TrackerGrid() {
+    const { trackConfig, patternId, pattern } = useSelector(
+        selector,
+        selectorEqual,
+    );
+
+    const styles = useStyles({ barLen: trackConfig?.barLen ?? 4 });
 
     const toggleBeat = ({
         note,
@@ -55,17 +65,21 @@ export default function TrackerGrid({
     //     [pattern.id],
     // );
 
+    if (!trackConfig || !pattern) {
+        return null;
+    }
+
     return (
         <TableContainer>
             <Table>
                 <GridTableHead
-                    patternLen={patternLen}
+                    patternLen={trackConfig.patternLen}
                     cellClassName={styles.cell}
                 />
                 <GridTableBody
-                    key={pattern.id}
+                    key={patternId}
                     pattern={pattern}
-                    patternLen={patternLen}
+                    patternLen={trackConfig.patternLen}
                     toggleBeat={toggleBeat}
                     cellClassName={styles.cell}
                 />

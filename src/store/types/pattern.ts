@@ -21,3 +21,4 @@ export interface Beat {
 
 export type PatternId = string;
 export type BeatId = string;
+export type Note = LibNote;

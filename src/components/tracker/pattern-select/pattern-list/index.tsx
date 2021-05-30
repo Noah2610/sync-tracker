@@ -1,9 +1,9 @@
 import { List } from "@material-ui/core";
-import Pattern, { PatternId } from "../../../../lib/track/pattern";
+import { Pattern, PatternId } from "../../../../store/types";
 import PatternListItem from "./pattern-list-item";
 
 export interface PatternListProps {
-    patterns: Pattern[];
+    patterns: Record<PatternId, Pick<Pattern, "name" | "order">>;
     selectedPatternId?: PatternId;
     selectPattern: (patternId: PatternId) => void;
 }
@@ -15,12 +15,12 @@ export default function PatternList({
 }: PatternListProps) {
     return (
         <List>
-            {patterns.map((pattern, i) => (
+            {Object.keys(patterns).map((patternId) => (
                 <PatternListItem
-                    key={i}
-                    pattern={pattern}
-                    isSelected={pattern.id === selectedPatternId}
-                    onClick={() => selectPattern(pattern.id)}
+                    key={patternId}
+                    pattern={patterns![patternId]}
+                    isSelected={patternId === selectedPatternId}
+                    onClick={() => selectPattern(patternId)}
                 />
             ))}
         </List>

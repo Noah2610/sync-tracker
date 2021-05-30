@@ -1,6 +1,4 @@
-import Beat from "../../../../lib/track/beat";
-import Note from "../../../../lib/track/note";
-import Pattern from "../../../../lib/track/pattern";
+import { Pattern, Note, Beat } from "../../../store/types";
 import BeatCell from "./beat-cell";
 import NoteCell from "./note-cell";
 import { BeatTableRow, TableBody } from "./styles";
@@ -31,7 +29,7 @@ export default function GridTableBody({
 
     return (
         <TableBody>
-            {pattern.notes.map((note, i) => (
+            {/* pattern.notes.map((note, i) => (
                 <BeatTableRow key={i}>
                     <NoteCell
                         component="th"
@@ -57,7 +55,7 @@ export default function GridTableBody({
                         );
                     })}
                 </BeatTableRow>
-            ))}
+            )) */}
         </TableBody>
     );
 }

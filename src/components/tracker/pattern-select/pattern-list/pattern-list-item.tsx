@@ -1,8 +1,8 @@
 import { ListItem, ListItemProps } from "@material-ui/core";
-import Pattern, { PatternId } from "../../../../lib/track/pattern";
+import { Pattern } from "../../../../store/types";
 
 export type PatternListItemProps = {
-    pattern: Pattern;
+    pattern: Pick<Pattern, "name">;
     isSelected: boolean;
 } & ListItemProps<"div">;
 

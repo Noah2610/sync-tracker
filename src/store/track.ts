@@ -33,6 +33,10 @@ const trackSlice = createSlice({
             state.selectedTrackId = payload;
         },
 
+        selectPattern(state, { payload }: PayloadAction<PatternId>) {
+            state.selectedPatternId = payload;
+        },
+
         setTrackIds(state, { payload }: PayloadAction<TrackId[]>) {
             state.trackIds = payload;
         },

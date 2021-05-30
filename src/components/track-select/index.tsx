@@ -34,7 +34,7 @@ export default function TrackSelect() {
         <FormControl className={styles.formControl}>
             <InputLabel id="select-track-label">Track</InputLabel>
             <Select
-                value={selectedTrackId}
+                value={selectedTrackId ?? ""}
                 variant="standard"
                 color="secondary"
                 labelId="select-track-label"
