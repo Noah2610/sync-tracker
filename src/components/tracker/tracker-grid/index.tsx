@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import { shallowEqual } from "react-redux";
 import { createStyles, makeStyles } from "@material-ui/core";
 import { actions, useDispatch, useSelector, State } from "../../../store";
-import { Pattern, Beat, Note } from "../../../store/types/pattern";
+import { Pattern, BeatId, Note, NoteId } from "../../../store/types/pattern";
 import GridTableBody from "./grid-table-body";
 import GridTableHead from "./grid-table-head";
 import { Table, TableContainer } from "./styles";
@@ -32,7 +32,10 @@ type SelectorReturn = ReturnType<typeof selector>;
 
 const selectorEqual = (a: SelectorReturn, b: SelectorReturn) =>
     a.patternId === b.patternId &&
-    // shallowEqual(Object.keys(a.pattern.notes), Object.keys(b.pattern.notes)) && // TODO
+    shallowEqual(
+        a.pattern && Object.keys(a.pattern.notes),
+        b.pattern && Object.keys(b.pattern.notes),
+    ) &&
     shallowEqual(a.trackConfig, b.trackConfig);
 
 export default function TrackerGrid() {
@@ -48,8 +51,8 @@ export default function TrackerGrid() {
         step,
         active,
     }: {
-        note: Note;
-        step: Beat;
+        note: NoteId;
+        step: BeatId;
         active: boolean;
     }) => console.log(`Toggle beat: ${note} at ${step} to ${active}`);
 

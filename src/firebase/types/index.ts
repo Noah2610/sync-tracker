@@ -18,8 +18,8 @@ export interface DocTrack {
 
 export interface DocPattern {
     name: Pattern["name"];
-    instrument: Pattern["instrument"];
     order: number;
+    instrument: Pattern["instrument"];
 }
 
 export interface DocNote {
@@ -27,6 +27,5 @@ export interface DocNote {
 }
 
 export interface DocBeat {
-    beat: Beat;
     isActive: boolean;
 }

@@ -1,5 +1,4 @@
 import LibPattern from "../../../lib/track/pattern";
-import LibBeat from "../../../lib/track/beat";
 import LibNote from "../../../lib/track/note";
 
 export type Patterns = Record<PatternId, Pattern>;
@@ -23,10 +22,9 @@ export interface Note {
 export type Beats = Record<BeatId, Beat>;
 
 export interface Beat {
-    beat: LibBeat;
     isActive: boolean;
 }
 
 export type PatternId = string;
-export type BeatId = string;
+export type BeatId = number;
 export type NoteId = LibNote;

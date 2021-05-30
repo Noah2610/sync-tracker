@@ -7,13 +7,24 @@ import {
     DocUser,
     DocTrack,
     DocPattern,
+    DocNote,
     DocBeat,
     CollectionReference,
     DocumentReference,
     DocumentSnapshot,
 } from "./types";
 import { actions, useDispatch, useSelector } from "../store";
-import { Track, Patterns, Beats, Beat, BeatId } from "../store/types";
+import {
+    Beat,
+    BeatId,
+    Beats,
+    Note,
+    NoteId,
+    Notes,
+    PatternId,
+    Patterns,
+    Track,
+} from "../store/types";
 
 export default function SyncFirebaseToStore() {
     const userEmail = useAuthState(auth)[0]?.email;
@@ -25,8 +36,24 @@ export default function SyncFirebaseToStore() {
         (state) => Object.keys(state.track.patterns),
         shallowEqual,
     );
-
-    // const user = useDocument(`/users/${userEmail}`);
+    const patternNoteIds = useSelector(
+        (state) =>
+            Object.keys(state.track.patterns).reduce<
+                Record<PatternId, NoteId[]>
+            >(
+                (acc, patternId) => ({
+                    ...acc,
+                    [patternId]: Object.keys(
+                        state.track.patterns[patternId]!.notes,
+                    ) as NoteId[],
+                }),
+                {},
+            ),
+        (a, b) =>
+            [...Object.keys(a), ...Object.keys(b)].every((patternId) =>
+                shallowEqual(a[patternId], b[patternId]),
+            ),
+    );
 
     // Update TRACK_IDS
     useEffect(() => {
@@ -58,7 +85,7 @@ export default function SyncFirebaseToStore() {
             ).onSnapshot((trackSnapshot) => {
                 const trackDoc = trackSnapshot.data();
                 if (trackDoc) {
-                    const track: Track = {
+                    const track: DocTrack = {
                         name: trackDoc.name,
                         config: trackDoc.config,
                         patternArrangement: trackDoc.patternArrangement,
@@ -74,12 +101,13 @@ export default function SyncFirebaseToStore() {
                     `${trackRef}/patterns`,
                 ) as CollectionReference<DocPattern>
             ).onSnapshot((patternCollection) => {
-                const patterns = patternCollection.docs.reduce<Patterns>(
+                const patterns = patternCollection.docs.reduce<
+                    Record<PatternId, DocPattern>
+                >(
                     (patterns, patternDoc) => ({
                         ...patterns,
                         [patternDoc.id]: {
                             ...patternDoc.data(),
-                            beats: {},
                         },
                     }),
                     {},
@@ -95,7 +123,7 @@ export default function SyncFirebaseToStore() {
         }
     }, [userEmail, selectedTrackId]);
 
-    // Update BEATS for every pattern
+    // Update NOTES for every pattern
     useEffect(() => {
         if (
             userEmail &&
@@ -107,26 +135,26 @@ export default function SyncFirebaseToStore() {
             for (const patternId of patternIds) {
                 const unsubscribe = (
                     firestore.collection(
-                        `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/beats`,
-                    ) as CollectionReference<DocBeat>
-                ).onSnapshot((beatCollection) => {
-                    const changedBeats = beatCollection
+                        `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/notes`,
+                    ) as CollectionReference<DocNote>
+                ).onSnapshot((noteCollection) => {
+                    const changedNotes = noteCollection
                         .docChanges()
-                        .reduce<Record<BeatId, Beat | null>>(
-                            (beats, beatDoc) => ({
-                                ...beats,
-                                [beatDoc.doc.id]:
-                                    beatDoc.newIndex === -1
+                        .reduce<{ [noteId in NoteId]?: DocNote | null }>(
+                            (notes, noteDoc) => ({
+                                ...notes,
+                                [noteDoc.doc.id]:
+                                    noteDoc.newIndex === -1
                                         ? null
-                                        : beatDoc.doc.data(),
+                                        : noteDoc.doc.data(),
                             }),
                             {},
                         );
 
                     dispatch(
-                        actions.track.updatePatternBeats({
+                        actions.track.updatePatternNotes({
                             patternId,
-                            beats: changedBeats,
+                            notes: changedNotes,
                         }),
                     );
                 }, console.error);
@@ -137,6 +165,55 @@ export default function SyncFirebaseToStore() {
             return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
         }
     }, [userEmail, selectedTrackId, patternIds]);
+
+    // Update BEATS for every note in every pattern
+    useEffect(() => {
+        if (
+            userEmail &&
+            selectedTrackId !== undefined &&
+            patternIds.length > 0
+        ) {
+            console.log("Update BEATS");
+
+            const unsubscribes: (() => void)[] = [];
+
+            for (const patternId of patternIds) {
+                for (const noteId of patternNoteIds[patternId] || []) {
+                    console.log(`${patternId}-${noteId}`);
+                    const unsubscribe = (
+                        firestore.collection(
+                            `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/notes/${noteId}/beats`,
+                        ) as CollectionReference<DocBeat>
+                    ).onSnapshot((beatCollection) => {
+                        const changedBeats = beatCollection
+                            .docChanges()
+                            .reduce<Record<BeatId, DocBeat | null>>(
+                                (beats, beatDoc) => ({
+                                    ...beats,
+                                    [beatDoc.doc.id]:
+                                        beatDoc.newIndex === -1
+                                            ? null
+                                            : beatDoc.doc.data(),
+                                }),
+                                {},
+                            );
+
+                        dispatch(
+                            actions.track.updatePatternBeats({
+                                patternId,
+                                noteId,
+                                beats: changedBeats,
+                            }),
+                        );
+                    }, console.error);
+
+                    unsubscribes.push(unsubscribe);
+                }
+            }
+
+            return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+        }
+    }, [userEmail, selectedTrackId, patternIds, patternNoteIds]);
 
     return null;
 }

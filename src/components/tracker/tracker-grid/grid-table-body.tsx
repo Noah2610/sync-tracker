@@ -1,4 +1,11 @@
-import { Pattern, Note, Beat } from "../../../store/types";
+import {
+    Pattern,
+    Note,
+    Notes,
+    NoteId,
+    Beat,
+    BeatId,
+} from "../../../store/types";
 import BeatCell from "./beat-cell";
 import NoteCell from "./note-cell";
 import { BeatTableRow, TableBody } from "./styles";
@@ -12,12 +19,17 @@ export interface GridTableBodyProps {
         step,
         active,
     }: {
-        note: Note;
-        step: Beat;
+        note: NoteId;
+        step: BeatId;
         active: boolean;
     }) => void;
     cellClassName?: string;
 }
+
+const sortNotes = (notes: Notes): NoteId[] =>
+    (Object.keys(notes) as NoteId[]).sort(
+        (a, b) => notes[a]!.order - notes[b]!.order,
+    ) as NoteId[];
 
 export default function GridTableBody({
     pattern,
@@ -26,27 +38,30 @@ export default function GridTableBody({
     cellClassName,
 }: GridTableBodyProps) {
     const instrument = useInstrument(pattern.instrument) || undefined;
+    const noteIds = sortNotes(pattern.notes);
 
     return (
         <TableBody>
-            {/* pattern.notes.map((note, i) => (
+            {noteIds.map((note, i) => (
                 <BeatTableRow key={i}>
                     <NoteCell
                         component="th"
-                        note={note.note}
+                        note={note}
                         instrument={instrument}
                     />
                     {Array.from({ length: patternLen }, (_, step) => {
-                        const isActive = note.beats.includes(step);
+                        const beatId = step;
+                        const beat = pattern.notes[note]!.beats[beatId];
+                        const isActive = beat?.isActive || false;
                         return (
                             <BeatCell
-                                key={`${i}-${step}`}
+                                key={`${i}-${beatId}`}
                                 className={cellClassName}
                                 component="td"
                                 isActive={isActive}
                                 toggle={() =>
                                     toggleBeat({
-                                        note: note.note,
+                                        note: note,
                                         step,
                                         active: !isActive,
                                     })
@@ -55,7 +70,7 @@ export default function GridTableBody({
                         );
                     })}
                 </BeatTableRow>
-            )) */}
+            ))}
         </TableBody>
     );
 }

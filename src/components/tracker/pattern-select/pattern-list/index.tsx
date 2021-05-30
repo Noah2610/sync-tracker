@@ -18,7 +18,7 @@ export default function PatternList({
             {Object.keys(patterns).map((patternId) => (
                 <PatternListItem
                     key={patternId}
-                    pattern={patterns![patternId]}
+                    pattern={patterns[patternId]!}
                     isSelected={patternId === selectedPatternId}
                     onClick={() => selectPattern(patternId)}
                 />

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { DocNote, DocBeat, DocPattern, DocTrack } from "../firebase/types";
 import {
     Track,
     TrackId,
@@ -44,12 +45,20 @@ const trackSlice = createSlice({
             state.trackIds = payload;
         },
 
-        setTrack(state, { payload }: PayloadAction<Track>) {
+        setTrack(state, { payload }: PayloadAction<DocTrack>) {
             state.track = payload;
         },
 
-        setPatterns(state, { payload }: PayloadAction<Patterns>) {
-            state.patterns = payload;
+        setPatterns(
+            state,
+            { payload }: PayloadAction<Record<PatternId, DocPattern>>,
+        ) {
+            for (const patternId in payload) {
+                state.patterns[patternId] = {
+                    ...payload[patternId]!,
+                    notes: state.patterns[patternId]?.notes || {},
+                };
+            }
         },
 
         setPatternNotes(
@@ -58,12 +67,18 @@ const trackSlice = createSlice({
                 payload: { patternId, notes },
             }: PayloadAction<{
                 patternId: PatternId;
-                notes: Notes;
+                notes: Record<NoteId, DocNote>;
             }>,
         ) {
             const pattern = state.patterns[patternId];
             if (pattern) {
-                pattern.notes = notes;
+                let noteId: NoteId;
+                for (noteId in notes) {
+                    pattern.notes[noteId] = {
+                        ...notes[noteId]!,
+                        beats: pattern.notes[noteId]?.beats || {},
+                    };
+                }
             } else {
                 console.error(
                     `Can't set notes for pattern ${patternId} because pattern doesn't exist`,
@@ -77,16 +92,19 @@ const trackSlice = createSlice({
                 payload: { patternId, notes },
             }: PayloadAction<{
                 patternId: PatternId;
-                notes: { [note in NoteId]?: Note | null };
+                notes: { [note in NoteId]?: DocNote | null };
             }>,
         ) {
             const pattern = state.patterns[patternId];
             if (pattern) {
                 let noteId: NoteId;
                 for (noteId in notes) {
-                    const note = notes[noteId] as Note | null;
+                    const note = notes[noteId];
                     if (note) {
-                        pattern.notes[noteId] = note;
+                        pattern.notes[noteId] = {
+                            ...note,
+                            beats: pattern.notes[noteId]?.beats || {},
+                        };
                     } else {
                         delete pattern.notes[noteId];
                     }
@@ -105,21 +123,25 @@ const trackSlice = createSlice({
             }: PayloadAction<{
                 patternId: PatternId;
                 noteId: NoteId;
-                beats: Record<BeatId, Beat | null>;
+                beats: Record<BeatId, DocBeat | null>;
             }>,
         ) {
             const pattern = state.patterns[patternId];
             if (pattern) {
                 const note = pattern.notes[noteId];
                 if (note) {
-                    for (const beatId of Object.keys(beats)) {
-                        const beat = beats[beatId] as Beat | null;
+                    for (const beatIdS in beats) {
+                        const beatId = parseInt(beatIdS) || -1;
+                        const beat = beats[beatId];
                         if (beat) {
                             note.beats[beatId] = beat;
                         } else {
-                            delete note.beats[beatId];
+                            if (note.beats[beatId]) {
+                                delete note.beats[beatId];
+                            }
                         }
                     }
+                } else {
                     console.error(
                         `Can't update beats for note ${noteId} in pattern ${patternId} because note doesn't exist`,
                     );
@@ -130,10 +152,6 @@ const trackSlice = createSlice({
                 );
             }
         },
-
-        // setTrack(state, { payload }: PayloadAction<Track>) {
-        //     state.track = payload;
-        // },
     },
 });
 
