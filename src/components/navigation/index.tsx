@@ -8,11 +8,12 @@ import {
 } from "@material-ui/core";
 import { ConnectedClients } from "../client";
 import Auth from "../user/auth";
+import TrackSelect from "../track-select";
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
         toolbar: {
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
         },
     }),
 );
@@ -26,9 +27,14 @@ export default function Navigation() {
                 <Container maxWidth="md">
                     <Toolbar className={styles.toolbar}>
                         <Box>
-                            <ConnectedClients names={["Foo", "Bar"]} />
+                            <TrackSelect />
                         </Box>
-                        <Box>
+                        <Box
+                            display="flex"
+                            justifyContent="flex-end"
+                            alignItems="center"
+                        >
+                            <ConnectedClients names={["Foo", "Bar"]} />
                             <Auth />
                         </Box>
                     </Toolbar>
