@@ -38,6 +38,16 @@ const selectorEqual = (a: SelectorReturn, b: SelectorReturn) =>
         a.pattern && Object.keys(a.pattern.notes),
         b.pattern && Object.keys(b.pattern.notes),
     ) &&
+    shallowEqual(
+        a.pattern &&
+            Object.keys(a.pattern.notes).map(
+                (note) => a.pattern?.notes[note as NoteId]!.order,
+            ),
+        b.pattern &&
+            Object.keys(b.pattern.notes).map(
+                (note) => b.pattern?.notes[note as NoteId]!.order,
+            ),
+    ) &&
     shallowEqual(a.trackConfig, b.trackConfig);
 
 export default function TrackerGrid() {

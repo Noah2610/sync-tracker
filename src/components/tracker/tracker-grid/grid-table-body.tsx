@@ -35,8 +35,8 @@ export default function GridTableBody({
 
     return (
         <TableBody>
-            {noteIds.map((note, i) => (
-                <BeatTableRow key={i}>
+            {noteIds.map((note) => (
+                <BeatTableRow key={note}>
                     <NoteCell
                         component="th"
                         note={note}
@@ -48,7 +48,7 @@ export default function GridTableBody({
                             toggleBeat({ beat: beatId, note, isActive });
                         return (
                             <BeatCell
-                                key={`${i}-${beatId}`}
+                                key={`${note}-${beatId}`}
                                 className={cellClassName}
                                 component="td"
                                 beat={beatId}
