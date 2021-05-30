@@ -3,8 +3,10 @@ import Head from "next/head";
 import { Container } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Navigation from "../components/navigation";
+import { Provider as StoreProvider } from "react-redux";
+import store from "../store";
 import muiTheme from "../theme";
+import Navigation from "../components/navigation";
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
@@ -21,13 +23,15 @@ export default function App({ Component, pageProps }: AppProps) {
                 />
             </Head>
 
-            <ThemeProvider theme={muiTheme}>
-                <CssBaseline />
-                <Navigation />
-                <Container maxWidth="md">
-                    <Component {...pageProps} />
-                </Container>
-            </ThemeProvider>
+            <StoreProvider store={store}>
+                <ThemeProvider theme={muiTheme}>
+                    <CssBaseline />
+                    <Navigation />
+                    <Container maxWidth="md">
+                        <Component {...pageProps} />
+                    </Container>
+                </ThemeProvider>
+            </StoreProvider>
         </>
     );
 }

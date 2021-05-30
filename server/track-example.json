@@ -10,6 +10,18 @@
         {
             "id": 0,
             "name": "Pattern 1",
+            "beats": [
+                {
+                    "note": "C2",
+                    "beat": 0,
+                    "isActive": true
+                },
+                {
+                    "note": "C2",
+                    "beat": 1,
+                    "isActive": true
+                }
+            ],
             "notes": [
                 {
                     "note": "C2",

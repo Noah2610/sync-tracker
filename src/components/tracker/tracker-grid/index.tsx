@@ -1,5 +1,5 @@
-import { createStyles, makeStyles } from "@material-ui/core";
 import { useCallback, useEffect } from "react";
+import { createStyles, makeStyles } from "@material-ui/core";
 import Beat from "../../../../lib/track/beat";
 import Note from "../../../../lib/track/note";
 import Pattern from "../../../../lib/track/pattern";
