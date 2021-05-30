@@ -17,23 +17,24 @@ export default function App({ Component, pageProps }: AppProps) {
                     name="viewport"
                     content="minimum-scale=1, initial-scale=1, width=device-width"
                 />
-                <link rel="preconnect" href="https://fonts.gstatic.com" />
-                <link
-                    rel="stylesheet"
-                    href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100;400;700&family=Roboto:wght@100;400;900&display=swap"
+                <meta
+                    name="theme-color"
+                    content={muiTheme.palette.primary.main}
                 />
             </Head>
 
-            <StoreProvider store={store}>
-                <SyncFirebaseToStore />
-                <ThemeProvider theme={muiTheme}>
-                    <CssBaseline />
-                    <Navigation />
-                    <Container maxWidth="md">
-                        <Component {...pageProps} />
-                    </Container>
-                </ThemeProvider>
-            </StoreProvider>
+            <main>
+                <StoreProvider store={store}>
+                    <SyncFirebaseToStore />
+                    <ThemeProvider theme={muiTheme}>
+                        <CssBaseline />
+                        <Navigation />
+                        <Container maxWidth="md">
+                            <Component {...pageProps} />
+                        </Container>
+                    </ThemeProvider>
+                </StoreProvider>
+            </main>
         </>
     );
 }
