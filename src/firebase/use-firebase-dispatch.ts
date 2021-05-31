@@ -1,16 +1,19 @@
 import { useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { firestore, auth } from ".";
+import { auth, firestore } from ".";
 import {
+    CollectionReference,
     DocumentReference,
-    DocTrack,
-    DocPattern,
-    DocNote,
     DocBeat,
+    DocNote,
+    DocPattern,
+    DocTrack,
 } from "./types";
 import { TrackId, PatternId, NoteId, BeatId } from "../store/types";
 
 export interface FirebaseDispatch {
+    newTrack(doc: DocTrack): Promise<DocumentReference<DocTrack>>;
+
     setTrack({ id, doc }: { id: TrackId; doc: DocTrack }): Promise<void>;
 
     setPattern({
@@ -57,6 +60,7 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
         if (!userEmail) {
             const reject = () => Promise.reject("No user email");
             return {
+                newTrack: reject,
                 setTrack: reject,
                 setPattern: reject,
                 setNote: reject,
@@ -66,6 +70,14 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
 
         const baseRef = `/users/${userEmail}`;
         return {
+            newTrack(doc) {
+                return (
+                    firestore.collection(
+                        `${baseRef}/tracks`,
+                    ) as CollectionReference<DocTrack>
+                ).add(doc);
+            },
+
             setTrack({ id, doc }) {
                 return (
                     firestore.doc(
