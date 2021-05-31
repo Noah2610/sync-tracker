@@ -12,9 +12,17 @@ import {
 import { TrackId, PatternId, NoteId, BeatId } from "../store/types";
 
 export interface FirebaseDispatch {
-    newTrack(doc: DocTrack): Promise<DocumentReference<DocTrack>>;
+    newTrack({ doc }: { doc: DocTrack }): Promise<DocumentReference<DocTrack>>;
 
     setTrack({ id, doc }: { id: TrackId; doc: DocTrack }): Promise<void>;
+
+    newPattern({
+        trackId,
+        doc,
+    }: {
+        trackId: TrackId;
+        doc: DocPattern;
+    }): Promise<DocPattern>;
 
     setPattern({
         id,
@@ -62,6 +70,7 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
             return {
                 newTrack: reject,
                 setTrack: reject,
+                newPattern: reject,
                 setPattern: reject,
                 setNote: reject,
                 setBeat: reject,
@@ -70,7 +79,7 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
 
         const baseRef = `/users/${userEmail}`;
         return {
-            newTrack(doc) {
+            newTrack({ doc }) {
                 return (
                     firestore.collection(
                         `${baseRef}/tracks`,
@@ -84,6 +93,14 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                         `${baseRef}/tracks/${id}`,
                     ) as DocumentReference<DocTrack>
                 ).set(doc);
+            },
+
+            newPattern({ trackId, doc }) {
+                return (
+                    firestore.collection(
+                        `${baseRef}/tracks/${trackId}/patterns`,
+                    ) as CollectionReference<DocPattern>
+                ).add(doc);
             },
 
             setPattern({ id, trackId, doc }) {

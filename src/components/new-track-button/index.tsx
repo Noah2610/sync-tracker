@@ -7,15 +7,30 @@ export default function NewTrackButton() {
 
     const newTrack = useCallback(
         () =>
-            firebaseDispatch.newTrack({
-                name: "New Track",
-                config: {
-                    bpm: 80,
-                    barLen: 4,
-                    patternLen: 16,
-                },
-                patternArrangement: [],
-            }),
+            firebaseDispatch
+                .newTrack({
+                    doc: {
+                        name: "New Track",
+                        config: {
+                            bpm: 80,
+                            barLen: 4,
+                            patternLen: 16,
+                        },
+                        patternArrangement: [],
+                    },
+                })
+                .then((track) =>
+                    firebaseDispatch.newPattern({
+                        trackId: track.id,
+                        doc: {
+                            name: "New Pattern",
+                            order: 0,
+                            instrument: {
+                                instrument: "Synth",
+                            },
+                        },
+                    }),
+                ),
         [firebaseDispatch],
     );
 
