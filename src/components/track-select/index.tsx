@@ -1,6 +1,7 @@
 import {
     createStyles,
     makeStyles,
+    Box,
     Select,
     MenuItem,
     FormControl,
@@ -8,6 +9,7 @@ import {
 } from "@material-ui/core";
 import { shallowEqual } from "react-redux";
 import { actions, useDispatch, useSelector } from "../../store";
+import NewTrackButton from "../new-track-button";
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
@@ -31,25 +33,40 @@ export default function TrackSelect() {
     );
 
     return (
-        <FormControl className={styles.formControl}>
-            <InputLabel id="select-track-label">Track</InputLabel>
-            <Select
-                value={selectedTrackId ?? ""}
-                variant="standard"
-                color="secondary"
-                labelId="select-track-label"
-                onChange={(event) =>
-                    dispatch(
-                        actions.track.selectTrack(event.target.value as string),
-                    )
-                }
-            >
-                {trackIds.map((trackId) => (
-                    <MenuItem key={trackId} value={trackId}>
-                        {trackId}
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
+        <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            gridGap={8}
+        >
+            <Box>
+                <FormControl className={styles.formControl}>
+                    <InputLabel id="select-track-label">Track</InputLabel>
+                    <Select
+                        value={selectedTrackId ?? ""}
+                        variant="standard"
+                        color="secondary"
+                        labelId="select-track-label"
+                        onChange={(event) =>
+                            dispatch(
+                                actions.track.selectTrack(
+                                    event.target.value as string,
+                                ),
+                            )
+                        }
+                    >
+                        {trackIds.map((trackId) => (
+                            <MenuItem key={trackId} value={trackId}>
+                                {trackId}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+
+            <Box>
+                <NewTrackButton />
+            </Box>
+        </Box>
     );
 }
