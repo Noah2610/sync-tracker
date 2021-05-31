@@ -22,7 +22,7 @@ export interface FirebaseDispatch {
     }: {
         trackId: TrackId;
         doc: DocPattern;
-    }): Promise<DocumentRefernce<DocPattern>>;
+    }): Promise<DocumentReference<DocPattern>>;
 
     setPattern({
         id,
