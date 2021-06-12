@@ -52,7 +52,6 @@ const trackSlice = createSlice({
 
         setTrack(state, { payload }: PayloadAction<DocTrack>) {
             state.track = payload;
-            state.patterns = {};
         },
 
         setPatterns(

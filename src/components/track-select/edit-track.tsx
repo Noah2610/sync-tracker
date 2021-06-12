@@ -1,35 +1,35 @@
-import { useState } from "react";
 import { Button } from "@material-ui/core";
 import useFirebaseDispatch from "../../firebase/use-firebase-dispatch";
-import { useDispatch, actions } from "../../store";
-import { Track } from "../../store/types";
+import useSelectedTrack from "../../hooks/use-selected-track";
 import useBooleanState from "../../hooks/use-boolean-state";
+import { Track } from "../../store/types";
 import TrackModal from "../track-modal";
 
-export default function NewTrack() {
-    const dispatch = useDispatch();
+export default function EditTrack() {
+    const [trackId, track] = useSelectedTrack();
     const firebaseDispatch = useFirebaseDispatch();
     const [isModalOpen, { on: openModal, off: closeModal }] =
         useBooleanState(false);
 
-    const newTrack = (track: Track) => {
+    if (!trackId || !track) {
+        return null;
+    }
+
+    const updateTrack = (track: Track) => {
         closeModal();
-        firebaseDispatch
-            .newTrack({ doc: track })
-            .then((trackDoc) =>
-                dispatch(actions.track.selectTrack(trackDoc.id)),
-            );
+        firebaseDispatch.setTrack({ id: trackId, doc: track });
     };
 
     return (
         <>
             <Button variant="contained" color="secondary" onClick={openModal}>
-                New Track
+                Edit
             </Button>
             <TrackModal
+                track={track}
                 isOpen={isModalOpen}
                 onClose={closeModal}
-                onSubmit={newTrack}
+                onSubmit={updateTrack}
             />
         </>
     );

@@ -11,8 +11,8 @@ import {
     FormHelperText,
     TextField,
 } from "@material-ui/core";
-import RecursivePartial from "../../../lib/util/recursive-partial";
-import { Track } from "../../store/types";
+import RecursivePartial from "../../lib/util/recursive-partial";
+import { Track } from "../store/types";
 
 export interface TrackModalProps {
     isOpen: boolean;

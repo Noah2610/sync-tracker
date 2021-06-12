@@ -12,6 +12,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import { actions, useDispatch, useSelector } from "../../store";
 import NewTrack from "./new-track";
+import EditTrack from "./edit-track";
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
@@ -73,6 +74,12 @@ export default function TrackSelect() {
                     </Select>
                 </FormControl>
             </Box>
+
+            {selectedTrackId ? (
+                <Box>
+                    <EditTrack />
+                </Box>
+            ) : null}
 
             <Box>
                 <NewTrack />
