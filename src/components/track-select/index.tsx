@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import { shallowEqual } from "react-redux";
 import { actions, useDispatch, useSelector } from "../../store";
-import NewTrackButton from "../new-track-button";
+import NewTrackButton from "./new-track-button";
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
