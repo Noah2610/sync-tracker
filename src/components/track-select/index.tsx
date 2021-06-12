@@ -8,6 +8,8 @@ import {
     InputLabel,
 } from "@material-ui/core";
 import { shallowEqual } from "react-redux";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase";
 import { actions, useDispatch, useSelector } from "../../store";
 import NewTrack from "./new-track";
 
@@ -20,6 +22,7 @@ const useStyles = makeStyles((_theme) =>
 );
 
 export default function TrackSelect() {
+    const [user] = useAuthState(auth);
     const styles = useStyles();
     const dispatch = useDispatch();
     const { selectedTrackId, tracks } = useSelector(
@@ -34,6 +37,10 @@ export default function TrackSelect() {
                 Object.values(b.tracks).map((track) => track.name),
             ),
     );
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <Box

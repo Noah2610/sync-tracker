@@ -1,4 +1,6 @@
 import { createStyles, makeStyles, Box } from "@material-ui/core";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase";
 import PatternSelect from "./pattern-select";
 import TrackerGrid from "./tracker-grid";
 
@@ -16,7 +18,12 @@ const useStyles = makeStyles((_theme) =>
 );
 
 export default function Tracker() {
+    const [user] = useAuthState(auth);
     const styles = useStyles();
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <Box className={styles.root}>
