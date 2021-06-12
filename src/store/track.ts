@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DocNote, DocBeat, DocPattern, DocTrack } from "../firebase/types";
 import {
     Track,
+    Tracks,
     TrackId,
     Pattern,
     Patterns,
@@ -15,17 +16,17 @@ import {
 } from "./types";
 
 export interface TrackStore {
-    trackIds: string[];
     selectedTrackId?: TrackId;
     selectedPatternId?: PatternId;
+    tracks: Tracks;
     track?: Track;
     patterns: Patterns;
 }
 
 const initialState: TrackStore = {
-    trackIds: [],
     selectedTrackId: undefined,
     selectedPatternId: undefined,
+    tracks: {},
     track: undefined,
     patterns: {},
 };
@@ -45,8 +46,8 @@ const trackSlice = createSlice({
             state.selectedPatternId = payload;
         },
 
-        setTrackIds(state, { payload }: PayloadAction<TrackId[]>) {
-            state.trackIds = payload;
+        setTracks(state, { payload }: PayloadAction<Tracks>) {
+            state.tracks = payload;
         },
 
         setTrack(state, { payload }: PayloadAction<DocTrack>) {

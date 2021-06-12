@@ -22,14 +22,17 @@ const useStyles = makeStyles((_theme) =>
 export default function TrackSelect() {
     const styles = useStyles();
     const dispatch = useDispatch();
-    const { selectedTrackId, trackIds } = useSelector(
+    const { selectedTrackId, tracks } = useSelector(
         (state) => ({
             selectedTrackId: state.track.selectedTrackId,
-            trackIds: state.track.trackIds,
+            tracks: state.track.tracks,
         }),
         (a, b) =>
             a.selectedTrackId === b.selectedTrackId &&
-            shallowEqual(a.trackIds, b.trackIds),
+            shallowEqual(
+                Object.values(a.tracks).map((track) => track.name),
+                Object.values(b.tracks).map((track) => track.name),
+            ),
     );
 
     return (
@@ -55,9 +58,9 @@ export default function TrackSelect() {
                             )
                         }
                     >
-                        {trackIds.map((trackId) => (
+                        {Object.keys(tracks).map((trackId) => (
                             <MenuItem key={trackId} value={trackId}>
-                                {trackId}
+                                {tracks[trackId]!.name || trackId}
                             </MenuItem>
                         ))}
                     </Select>

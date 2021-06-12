@@ -24,6 +24,7 @@ import {
     PatternId,
     Patterns,
     Track,
+    Tracks,
 } from "../store/types";
 
 export default function SyncFirebaseToStore() {
@@ -55,7 +56,7 @@ export default function SyncFirebaseToStore() {
             ),
     );
 
-    // Update TRACK_IDS
+    // Update TRACKS
     useEffect(() => {
         if (userEmail) {
             const unsubscribe = (
@@ -63,11 +64,15 @@ export default function SyncFirebaseToStore() {
                     `/users/${userEmail}/tracks`,
                 ) as CollectionReference<DocTrack>
             ).onSnapshot((trackCollection) => {
-                const trackIds = trackCollection.docs.map(
-                    (docTrack) => docTrack.id,
+                const tracks = trackCollection.docs.reduce<Tracks>(
+                    (tracks, doc) => ({
+                        ...tracks,
+                        [doc.id]: doc.data(),
+                    }),
+                    {},
                 );
 
-                dispatch(actions.track.setTrackIds(trackIds));
+                dispatch(actions.track.setTracks(tracks));
             }, console.error);
 
             return unsubscribe;
