@@ -6,13 +6,10 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     FormControl,
     FormHelperText,
-    InputLabel,
     TextField,
-    Typography,
 } from "@material-ui/core";
 import RecursivePartial from "../../../lib/util/recursive-partial";
 import { Track } from "../../store/types";

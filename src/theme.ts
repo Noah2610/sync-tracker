@@ -79,4 +79,13 @@ export default createMuiTheme({
         fontSize: 14,
         fontFamily: "Roboto",
     },
+    overrides: {
+        MuiListItem: {
+            root: {
+                "&$selected": {
+                    backgroundColor: "rgba(0, 0, 0, 0.75)",
+                },
+            },
+        },
+    },
 });

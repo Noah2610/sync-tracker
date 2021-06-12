@@ -15,14 +15,19 @@ export default function PatternList({
 }: PatternListProps) {
     return (
         <List>
-            {Object.keys(patterns).map((patternId) => (
-                <PatternListItem
-                    key={patternId}
-                    pattern={patterns[patternId]!}
-                    isSelected={patternId === selectedPatternId}
-                    onClick={() => selectPattern(patternId)}
-                />
-            ))}
+            {Object.keys(patterns)
+                .sort(
+                    (patternA, patternB) =>
+                        patterns[patternA]!.order - patterns[patternB]!.order,
+                )
+                .map((patternId) => (
+                    <PatternListItem
+                        key={patternId}
+                        pattern={patterns[patternId]!}
+                        isSelected={patternId === selectedPatternId}
+                        onClick={() => selectPattern(patternId)}
+                    />
+                ))}
         </List>
     );
 }

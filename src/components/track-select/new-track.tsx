@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Button } from "@material-ui/core";
 import useFirebaseDispatch from "../../firebase/use-firebase-dispatch";
 import { useDispatch, actions } from "../../store";
