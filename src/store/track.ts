@@ -3,6 +3,7 @@ import { DocNote, DocBeat, DocPattern, DocTrack } from "../firebase/types";
 import {
     Track,
     TrackId,
+    Pattern,
     Patterns,
     PatternId,
     Note,
@@ -35,6 +36,9 @@ const trackSlice = createSlice({
     reducers: {
         selectTrack(state, { payload }: PayloadAction<TrackId>) {
             state.selectedTrackId = payload;
+            state.track = undefined;
+            state.selectedPatternId = undefined;
+            state.patterns = {};
         },
 
         selectPattern(state, { payload }: PayloadAction<PatternId>) {
@@ -47,6 +51,7 @@ const trackSlice = createSlice({
 
         setTrack(state, { payload }: PayloadAction<DocTrack>) {
             state.track = payload;
+            state.patterns = {};
         },
 
         setPatterns(
@@ -58,6 +63,22 @@ const trackSlice = createSlice({
                     ...payload[patternId]!,
                     notes: state.patterns[patternId]?.notes || {},
                 };
+            }
+
+            if (state.selectedTrackId && !state.selectedPatternId) {
+                const firstPattern = Object.keys(state.patterns).reduce<
+                    [PatternId, Pattern] | undefined
+                >(
+                    (acc, patternId) =>
+                        acc === undefined ||
+                        state.patterns[patternId]!.order < acc[1].order
+                            ? [patternId, state.patterns[patternId]! as Pattern]
+                            : acc,
+                    undefined,
+                );
+                if (firstPattern) {
+                    state.selectedPatternId = firstPattern[0];
+                }
             }
         },
 
