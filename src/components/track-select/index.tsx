@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import { shallowEqual } from "react-redux";
 import { actions, useDispatch, useSelector } from "../../store";
-import NewTrackButton from "./new-track-button";
+import NewTrack from "./new-track";
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
@@ -68,7 +68,7 @@ export default function TrackSelect() {
             </Box>
 
             <Box>
-                <NewTrackButton />
+                <NewTrack />
             </Box>
         </Box>
     );
