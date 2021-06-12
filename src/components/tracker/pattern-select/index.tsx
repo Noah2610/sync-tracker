@@ -1,7 +1,9 @@
 import { shallowEqual } from "react-redux";
+import { Box } from "@material-ui/core";
 import { actions, useDispatch, useSelector, State } from "../../../store";
 import { PatternId, Patterns } from "../../../store/types";
 import PatternList from "./pattern-list";
+import NewPatternButton from "./new-pattern-button";
 
 const selector = (state: State) => ({
     patterns: state.track.patterns,
@@ -37,10 +39,13 @@ export default function PatternSelect() {
         dispatch(actions.track.selectPattern(id));
 
     return (
-        <PatternList
-            patterns={patterns}
-            selectedPatternId={selectedPatternId}
-            selectPattern={selectPattern}
-        />
+        <Box display="flex" flexDirection="column">
+            <PatternList
+                patterns={patterns}
+                selectedPatternId={selectedPatternId}
+                selectPattern={selectPattern}
+            />
+            <NewPatternButton />
+        </Box>
     );
 }
