@@ -27,7 +27,7 @@ export default function useInstrument(
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            switch (instrumentData.instrument) {
+            switch (instrumentData.name) {
                 case "Synth": {
                     setInstrument(
                         new Synth(instrumentData.options).toDestination(),

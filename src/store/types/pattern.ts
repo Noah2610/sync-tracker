@@ -7,7 +7,7 @@ export interface Pattern {
     name: LibPattern["name"];
     order: number;
     notes: Notes;
-    instrument: LibPattern["instrument"];
+    instrument: Instrument;
 }
 
 export type Notes = {
@@ -24,6 +24,8 @@ export type Beats = Record<BeatId, Beat>;
 export interface Beat {
     isActive: boolean;
 }
+
+export type Instrument = LibPattern["instrument"];
 
 export type PatternId = string;
 export type BeatId = number;

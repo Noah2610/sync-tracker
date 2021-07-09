@@ -9,22 +9,22 @@ import * as z from "zod";
 type Instrument =
     | {
           // https://tonejs.github.io/docs/14.7.77/Synth
-          instrument: "Synth";
+          name: "Synth";
           options?: RecursivePartial<SynthOptions>;
       }
     | {
           // https://tonejs.github.io/docs/14.7.77/NoiseSynth
-          instrument: "NoiseSynth";
+          name: "NoiseSynth";
           options?: RecursivePartial<NoiseSynthOptions>;
       };
 
 export const InstrumentSchema: z.ZodSchema<Instrument> = z.union([
     z.object({
-        instrument: z.literal("Synth"),
+        name: z.literal("Synth"),
         options: z.any().optional(),
     }),
     z.object({
-        instrument: z.literal("NoiseSynth"),
+        name: z.literal("NoiseSynth"),
         options: z.any().optional(),
     }),
 ]);
