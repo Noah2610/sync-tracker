@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import Instrument from "../../lib/track/instrument";
-import { Synth, SynthOptions, NoiseSynth, NoiseSynthOptions } from "tone";
+import {
+    Synth,
+    SynthOptions,
+    NoiseSynth,
+    NoiseSynthOptions,
+    PolySynth,
+} from "tone";
 
-export type ToneInstrument = Synth | NoiseSynth;
+export type ToneInstrument = Synth | PolySynth | NoiseSynth;
 
 // type InstrumentOfType<I extends Instrument["instrument"]> = Instrument & {
 //     instrument: I;
@@ -29,9 +35,10 @@ export default function useInstrument(
         if (typeof window !== "undefined") {
             switch (instrumentData.name) {
                 case "Synth": {
-                    setInstrument(
-                        new Synth(instrumentData.options).toDestination(),
-                    );
+                    const instr = instrumentData.isPoly
+                        ? new PolySynth(Synth, instrumentData.options)
+                        : new Synth(instrumentData.options);
+                    setInstrument(instr.toDestination());
                     break;
                 }
                 case "NoiseSynth": {

@@ -11,6 +11,7 @@ type Instrument =
           // https://tonejs.github.io/docs/14.7.77/Synth
           name: "Synth";
           options?: RecursivePartial<SynthOptions>;
+          isPoly?: boolean;
       }
     | {
           // https://tonejs.github.io/docs/14.7.77/NoiseSynth
@@ -22,6 +23,7 @@ export const InstrumentSchema: z.ZodSchema<Instrument> = z.union([
     z.object({
         name: z.literal("Synth"),
         options: z.any().optional(),
+        isPoly: z.boolean().optional(),
     }),
     z.object({
         name: z.literal("NoiseSynth"),
