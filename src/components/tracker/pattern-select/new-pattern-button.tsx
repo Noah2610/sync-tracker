@@ -18,7 +18,8 @@ export default function NewPatternButton() {
                         name: "New Pattern",
                         order: 0,
                         instrument: {
-                            instrument: "Synth",
+                            name: "Synth",
+                            isPoly: true,
                         },
                     },
                 })
@@ -27,15 +28,45 @@ export default function NewPatternButton() {
                         (
                             [
                                 {
-                                    id: "C2",
+                                    id: "B2",
                                     doc: {
                                         order: 0,
                                     },
                                 },
                                 {
-                                    id: "D2",
+                                    id: "A2",
                                     doc: {
                                         order: 1,
+                                    },
+                                },
+                                {
+                                    id: "G2",
+                                    doc: {
+                                        order: 2,
+                                    },
+                                },
+                                {
+                                    id: "F2",
+                                    doc: {
+                                        order: 3,
+                                    },
+                                },
+                                {
+                                    id: "E2",
+                                    doc: {
+                                        order: 4,
+                                    },
+                                },
+                                {
+                                    id: "D2",
+                                    doc: {
+                                        order: 5,
+                                    },
+                                },
+                                {
+                                    id: "C2",
+                                    doc: {
+                                        order: 6,
                                     },
                                 },
                             ] as { id: NoteId; doc: DocNote }[]
