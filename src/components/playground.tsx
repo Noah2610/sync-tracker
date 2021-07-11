@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as Tone from "tone";
 import usePatternNotes from "../hooks/use-pattern-notes";
 import useSelectedPattern from "../hooks/use-selected-pattern";
@@ -11,9 +11,84 @@ export default function Playground() {
     // const [, instrument] = useSelectedPatternInstrument();
     const [patternId, pattern] = useSelectedPattern();
 
+    return <PlaygroundEnvelope />;
+
     return patternId !== undefined && pattern ? (
         <PlaygroundPattern patternId={patternId} pattern={pattern} />
     ) : null;
+}
+
+function PlaygroundEnvelope() {
+    const [btn, setBtn] = useState(0);
+
+    useEffect(() => {
+        const env = new Tone.AmplitudeEnvelope();
+        env.attack = 1.0;
+        env.sustain = 1.0;
+        env.release = 1.0;
+        env.attackCurve = "exponential";
+        env.releaseCurve = "exponential";
+        // synth.connect(env).toDestination();
+
+        // const channel = new Tone.Channel(1, -1).connect(
+        //     new Tone.Distortion(1.0).toDestination(),
+        // );
+
+        const channel = new Tone.Channel(0.1, -1);
+        const vibrato = new Tone.Vibrato("C4", 1.0);
+        const distortion = new Tone.Distortion(1.0);
+
+        const synth = new Tone.Synth({
+            envelope: {
+                attack: 0.2,
+                sustain: 1.0,
+                release: 0.5,
+            },
+        }).chain(vibrato, distortion, channel);
+
+        // synth.toDestination();
+        channel.toDestination();
+
+        // channel.disconnect(Tone.Destination);
+
+        // .connect(channel);
+
+        // synth.disconnect(channel).toDestination();
+
+        // const distortion = new Tone.Distortion(1.0);
+        // const channel = new Tone.Channel(1, -1).toDestination();
+
+        // distortion.connect(channel);
+
+        // synth.connect(distortion);
+
+        // .connect()
+        // .chain(
+        //     new Tone.Channel(1),
+        //     Tone.Destination,
+        // );
+
+        console.log(synth.envelope);
+
+        const start = Tone.now();
+
+        // Tone.Transport.start(now, "0:0:0");
+
+        // env.triggerAttackRelease("1n");
+
+        synth.triggerAttackRelease("C2", "1n", start);
+        // env.triggerAttackRelease("1n", start + 2);
+
+        return () => {
+            synth.dispose();
+
+            // osc.dispose();
+            // env.dispose();
+            // Tone.Transport.stop();
+        };
+    }, [btn]);
+
+    return <button onClick={() => setBtn((v) => ++v)}>PLAY</button>;
 }
 
 function PlaygroundPattern({
