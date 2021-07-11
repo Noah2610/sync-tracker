@@ -30,8 +30,8 @@ export interface CellEffect {
 }
 
 export interface CellCommand {
-    tpye: "command";
-    command: "cutCommand" | "nextPattern";
+    type: "command";
+    command: "cut" | "skip";
 }
 
 export type NoteAttack = number;
