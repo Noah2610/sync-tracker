@@ -34,19 +34,28 @@ function PlaygroundEnvelope() {
         //     new Tone.Distortion(1.0).toDestination(),
         // );
 
-        const channel = new Tone.Channel(0.1, -1);
-        const vibrato = new Tone.Vibrato("C4", 1.0);
-        const distortion = new Tone.Distortion(1.0);
-
         const synth = new Tone.Synth({
             envelope: {
                 attack: 0.2,
                 sustain: 1.0,
                 release: 0.5,
             },
-        }).chain(vibrato, distortion, channel);
+        });
+        const channel = new Tone.Channel(-8, -1);
+        const vibrato = new Tone.Vibrato("C4", 1.0);
+        const distortion = new Tone.Distortion(1.0);
+
+        synth.set({
+            envelope: {
+                attack: 1.0,
+                attackCurve: "linear",
+            },
+        });
+        synth.chain(vibrato, distortion, channel);
 
         // synth.toDestination();
+        // vibrato.toDestination();
+        // distortion.toDestination();
         channel.toDestination();
 
         // channel.disconnect(Tone.Destination);
