@@ -1,0 +1,52 @@
+{
+    "cells": {
+        "0:0": [
+            {
+                "type": "attack",
+                "note": "C2",
+                "attack": 1.0
+            },
+            {
+                "type": "effect",
+                "effectType": "eff-V",
+                "payload": {
+                    "velocity": 0.5
+                }
+            },
+            {
+                "type": "effect",
+                "effectType": "eff-B",
+                "payload": {
+                    "bogus": 1.0
+                }
+            },
+            {
+                "type": "effect",
+                "effectType": "eff-B",
+                "payload": null
+            }
+        ],
+        "1:0": [
+            {
+                "type": "attack",
+                "note": "D2"
+            },
+            {
+                "type": "effect",
+                "effect": "eff-B"
+            }
+        ],
+        "2:0": [
+            {
+                "type": "release",
+                "release": 0.5
+            }
+        ],
+        "3:0": [
+            {
+                "type": "command",
+                "command": "cut"
+            }
+        ]
+    }
+}
