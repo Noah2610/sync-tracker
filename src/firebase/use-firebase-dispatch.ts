@@ -16,6 +16,8 @@ export interface FirebaseDispatch {
 
     setTrack({ id, doc }: { id: TrackId; doc: DocTrack }): Promise<void>;
 
+    deleteTrack({ id }: { id: TrackId }): Promise<void>;
+
     newPattern({
         trackId,
         doc,
@@ -70,6 +72,7 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
             return {
                 newTrack: reject,
                 setTrack: reject,
+                deleteTrack: reject,
                 newPattern: reject,
                 setPattern: reject,
                 setNote: reject,
@@ -93,6 +96,10 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                         `${baseRef}/tracks/${id}`,
                     ) as DocumentReference<DocTrack>
                 ).set(doc);
+            },
+
+            deleteTrack({ id }) {
+                return firestore.doc(`${baseRef}/tracks/${id}`).delete();
             },
 
             newPattern({ trackId, doc }) {
