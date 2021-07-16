@@ -13,6 +13,7 @@ import { auth } from "../../firebase";
 import { actions, useDispatch, useSelector } from "../../store";
 import NewTrack from "./new-track";
 import EditTrack from "./edit-track";
+import DeleteTrack from "./delete-track";
 
 const useStyles = makeStyles((_theme) =>
     createStyles({
@@ -76,9 +77,14 @@ export default function TrackSelect() {
             </Box>
 
             {selectedTrackId ? (
-                <Box>
-                    <EditTrack />
-                </Box>
+                <>
+                    <Box>
+                        <EditTrack />
+                    </Box>
+                    <Box>
+                        <DeleteTrack />
+                    </Box>
+                </>
             ) : null}
 
             <Box>
