@@ -18,31 +18,30 @@ export interface DeleteTrackBoxProps {
     onSubmit: () => void;
 }
 
-export default function DeleteTrackBox({
+export default function DeleteTrackDialog({
     isOpen,
     onClose,
     track,
     onSubmit,
 }: DeleteTrackBoxProps) {
-
     const handleSubmit = () => {
         console.log("yo");
         onSubmit();
-    }
+    };
 
     return (
         <Dialog open={isOpen} onClose={onClose}>
             <DialogTitle>Permanently delete {track.name}?</DialogTitle>
             <Button variant="contained" onClick={onClose}>
-                    Cancel
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleSubmit}
-                >
-                    yeet dat shit
-                </Button>
+                Cancel
+            </Button>
+            <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleSubmit}
+            >
+                yeet dat shit
+            </Button>
         </Dialog>
     );
 }
