@@ -3,6 +3,8 @@ import useFirebaseDispatch from "../../firebase/use-firebase-dispatch";
 import useSelectedTrack from "../../hooks/use-selected-track";
 import useBooleanState from "../../hooks/use-boolean-state";
 import TrackModal from "../track-modal";
+import DeleteTrackBox from "../delete-track-box";
+
 
 export default function DeleteTrack() {
     const [trackId, track] = useSelectedTrack();
@@ -22,9 +24,9 @@ export default function DeleteTrack() {
     return (
         <>
             <Button variant="contained" color="secondary" onClick={openModal}>
-                Delete
+                Delete Track
             </Button>
-            <TrackModal
+            <DeleteTrackBox
                 track={track}
                 isOpen={isModalOpen}
                 onClose={closeModal}
