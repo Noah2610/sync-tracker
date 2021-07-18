@@ -7,215 +7,318 @@ import {
     DocUser,
     DocTrack,
     DocPattern,
-    DocNote,
-    DocBeat,
     CollectionReference,
     DocumentReference,
     DocumentSnapshot,
+    DocChannel,
+    DocCell,
 } from "./types";
 import { actions, useDispatch, useSelector } from "../store";
-import {
-    Beat,
-    BeatId,
-    Beats,
-    Note,
-    NoteId,
-    Notes,
-    PatternId,
-    Patterns,
-    Track,
-    Tracks,
-} from "../store/types";
+import { ChannelId, PatternId, Patterns, Track, Tracks } from "../store/types";
+import safeObjectKeys from "../util/safeObjectKeys";
+import { createUnsubs } from "../util/unsubs";
 
 export default function SyncFirebaseToStore() {
     const userEmail = useAuthState(auth)[0]?.email;
 
     const dispatch = useDispatch();
 
-    const selectedTrackId = useSelector((state) => state.track.selectedTrackId);
-    const patternIds = useSelector(
-        (state) => Object.keys(state.track.patterns),
-        shallowEqual,
+    const selectedTrackId = useSelector(
+        (state) => state.track.selectedTrack?.id,
     );
-    const patternNoteIds = useSelector(
-        (state) =>
-            Object.keys(state.track.patterns).reduce<
-                Record<PatternId, NoteId[]>
-            >(
-                (acc, patternId) => ({
-                    ...acc,
-                    [patternId]: Object.keys(
-                        state.track.patterns[patternId]!.notes,
-                    ) as NoteId[],
-                }),
-                {},
-            ),
-        (a, b) =>
-            [...Object.keys(a), ...Object.keys(b)].every((patternId) =>
-                shallowEqual(a[patternId], b[patternId]),
-            ),
+    const selectedPatternId = useSelector(
+        (state) => state.track.selectedTrack?.selectedPattern?.id,
     );
+    const patternAndChannelIds = useSelector((state) => {
+        if (!state.track.selectedTrack) {
+            return undefined;
+        }
+        const track = state.track.tracks[state.track.selectedTrack.id];
+        if (!track) {
+            return undefined;
+        }
+        return Object.values(track.patterns).reduce<
+            Record<PatternId, ChannelId[]>
+        >(
+            (acc, pattern) => ({
+                ...acc,
+                [pattern.id]: safeObjectKeys(pattern.channels),
+            }),
+            {},
+        );
+    }, shallowEqual);
+
+    // const patternNoteIds = useSelector(
+    //     (state) =>
+    //         Object.keys(state.track.patterns).reduce<
+    //             Record<PatternId, NoteId[]>
+    //         >(
+    //             (acc, patternId) => ({
+    //                 ...acc,
+    //                 [patternId]: Object.keys(
+    //                     state.track.patterns[patternId]!.notes,
+    //                 ) as NoteId[],
+    //             }),
+    //             {},
+    //         ),
+    //     (a, b) =>
+    //         [...Object.keys(a), ...Object.keys(b)].every((patternId) =>
+    //             shallowEqual(a[patternId], b[patternId]),
+    //         ),
+    // );
 
     // Update TRACKS
     useEffect(() => {
-        if (userEmail) {
-            const unsubscribe = (
-                firestore.collection(
-                    `/users/${userEmail}/tracks`,
-                ) as CollectionReference<DocTrack>
-            ).onSnapshot((trackCollection) => {
-                const tracks = trackCollection.docs.reduce<Tracks>(
-                    (tracks, doc) => ({
-                        ...tracks,
-                        [doc.id]: doc.data(),
-                    }),
-                    {},
-                );
-
-                dispatch(actions.track.setTracks(tracks));
-            }, console.error);
-
-            return unsubscribe;
+        if (!userEmail) {
+            return;
         }
+
+        const unsubscribe = (
+            firestore.collection(
+                `/users/${userEmail}/tracks`,
+            ) as CollectionReference<DocTrack>
+        ).onSnapshot((trackCollection) => {
+            const tracks = trackCollection.docs.reduce<DocTrack[]>(
+                (tracks, doc) => [
+                    ...tracks,
+                    {
+                        ...{ id: doc.id },
+                        ...doc.data(),
+                    },
+                ],
+                [],
+            );
+
+            dispatch(actions.track.setStateTracks(tracks));
+        }, console.error);
+
+        return unsubscribe;
     }, [userEmail]);
 
     // Update TRACK and PATTERNS from selectedTrackId
     useEffect(() => {
-        if (userEmail && selectedTrackId !== undefined) {
-            const trackRef = `/users/${userEmail}/tracks/${selectedTrackId}`;
+        if (!userEmail || selectedTrackId === undefined) {
+            return;
+        }
 
-            // Update TRACK
-            const unsubscribeTrack = (
-                firestore.doc(trackRef) as DocumentReference<DocTrack>
-            ).onSnapshot((trackSnapshot) => {
-                const trackDoc = trackSnapshot.data();
-                if (trackDoc) {
-                    const track: DocTrack = {
-                        name: trackDoc.name,
-                        config: trackDoc.config,
-                        patternArrangement: trackDoc.patternArrangement,
-                    };
+        const trackRef = `/users/${userEmail}/tracks/${selectedTrackId}`;
 
-                    dispatch(actions.track.setTrack(track));
-                }
-            }, console.error);
+        const unsubs: (() => void)[] = [];
 
-            // Update PATTERNS
-            const unsubscribePatterns = (
+        // Update TRACK
+        unsubs.push(
+            (firestore.doc(trackRef) as DocumentReference<DocTrack>).onSnapshot(
+                (trackSnapshot) => {
+                    const trackDoc = trackSnapshot.data();
+                    if (trackDoc) {
+                        dispatch(
+                            actions.track.setStateTracks([
+                                {
+                                    ...{ id: trackSnapshot.id },
+                                    ...trackDoc,
+                                },
+                            ]),
+                        );
+                    }
+                },
+                console.error,
+            ),
+        );
+
+        // Update PATTERNS
+        const patternsRef = `${trackRef}/patterns`;
+        unsubs.push(
+            (
                 firestore.collection(
-                    `${trackRef}/patterns`,
+                    patternsRef,
                 ) as CollectionReference<DocPattern>
             ).onSnapshot((patternCollection) => {
-                const patterns = patternCollection.docs.reduce<
-                    Record<PatternId, DocPattern>
-                >(
-                    (patterns, patternDoc) => ({
-                        ...patterns,
-                        [patternDoc.id]: {
-                            ...patternDoc.data(),
-                        },
+                const patterns = patternCollection.docs.map((patternDoc) => ({
+                    ...{ id: patternDoc.id },
+                    ...patternDoc.data(),
+                }));
+
+                dispatch(
+                    actions.track.setStatePatterns({
+                        trackId: selectedTrackId,
+                        patterns,
                     }),
-                    {},
                 );
+            }, console.error),
+        );
 
-                dispatch(actions.track.setPatterns(patterns));
-            }, console.error);
-
-            return () => {
-                unsubscribeTrack();
-                unsubscribePatterns();
-            };
-        }
+        return () => unsubs.forEach((cb) => cb());
     }, [userEmail, selectedTrackId]);
 
-    // Update NOTES for every pattern
+    // Update CHANNELS from selectedTrackId and pattern IDs
     useEffect(() => {
         if (
-            userEmail &&
-            selectedTrackId !== undefined &&
-            patternIds.length > 0
+            !userEmail ||
+            selectedTrackId === undefined ||
+            !patternAndChannelIds
         ) {
-            const unsubscribes: (() => void)[] = [];
+            return;
+        }
 
-            for (const patternId of patternIds) {
-                const unsubscribe = (
+        const channelsRef = `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${selectedPatternId}/channels`;
+
+        const unsubs = createUnsubs();
+
+        for (const patternId of safeObjectKeys(patternAndChannelIds)) {
+            unsubs.add(
+                (
                     firestore.collection(
-                        `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/notes`,
-                    ) as CollectionReference<DocNote>
-                ).onSnapshot((noteCollection) => {
-                    const changedNotes = noteCollection
-                        .docChanges()
-                        .reduce<{ [noteId in NoteId]?: DocNote | null }>(
-                            (notes, noteDoc) => ({
-                                ...notes,
-                                [noteDoc.doc.id]:
-                                    noteDoc.newIndex === -1
-                                        ? null
-                                        : noteDoc.doc.data(),
-                            }),
-                            {},
-                        );
-
+                        channelsRef,
+                    ) as CollectionReference<DocChannel>
+                ).onSnapshot((channelCollection) => {
+                    const channels = channelCollection.docs.map(
+                        (channelDoc) => ({
+                            ...{ id: channelDoc.id },
+                            ...channelDoc.data(),
+                        }),
+                    );
                     dispatch(
-                        actions.track.updatePatternNotes({
+                        actions.track.setStateChannels({
+                            trackId: selectedTrackId,
+                            patternId: patternId,
+                            channels,
+                        }),
+                    );
+                }),
+            );
+        }
+
+        return unsubs.unsubAll;
+    }, [userEmail, selectedTrackId, patternAndChannelIds]);
+
+    // Update CELLS from selectedTrackId and channel IDs
+    useEffect(() => {
+        if (
+            !userEmail ||
+            selectedTrackId === undefined ||
+            !patternAndChannelIds
+        ) {
+            return;
+        }
+
+        const unsubs = createUnsubs();
+
+        for (const patternId of safeObjectKeys(patternAndChannelIds)) {
+            const channelIds = patternAndChannelIds[patternId]!;
+            for (const channelId of channelIds) {
+                const cellsRef = `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/channels/${channelId}/cells`;
+                (
+                    firestore.collection(
+                        cellsRef,
+                    ) as CollectionReference<DocCell>
+                ).onSnapshot((cellsSnapshot) => {
+                    const cells = cellsSnapshot.docs.map((cell) => ({
+                        ...{ id: cell.id },
+                        ...cell.data(),
+                    }));
+                    dispatch(
+                        actions.track.setStateCells({
+                            trackId: selectedTrackId,
                             patternId,
-                            notes: changedNotes,
+                            channelId,
+                            cells,
                         }),
                     );
                 }, console.error);
-
-                unsubscribes.push(unsubscribe);
             }
-
-            return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
         }
-    }, [userEmail, selectedTrackId, patternIds]);
 
-    // Update BEATS for every note in every pattern
-    useEffect(() => {
-        if (
-            userEmail &&
-            selectedTrackId !== undefined &&
-            patternIds.length > 0
-        ) {
-            const unsubscribes: (() => void)[] = [];
+        return unsubs.unsubAll;
+    }, [userEmail, selectedTrackId, patternAndChannelIds]);
 
-            for (const patternId of patternIds) {
-                for (const noteId of patternNoteIds[patternId] || []) {
-                    const unsubscribe = (
-                        firestore.collection(
-                            `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/notes/${noteId}/beats`,
-                        ) as CollectionReference<DocBeat>
-                    ).onSnapshot((beatCollection) => {
-                        const changedBeats = beatCollection
-                            .docChanges()
-                            .reduce<Record<BeatId, DocBeat | null>>(
-                                (beats, beatDoc) => ({
-                                    ...beats,
-                                    [beatDoc.doc.id]:
-                                        beatDoc.newIndex === -1
-                                            ? null
-                                            : beatDoc.doc.data(),
-                                }),
-                                {},
-                            );
+    // Update NOTES for every pattern
+    // useEffect(() => {
+    //     if (
+    //         userEmail &&
+    //         selectedTrackId !== undefined &&
+    //         patternIds.length > 0
+    //     ) {
+    //         const unsubscribes: (() => void)[] = [];
 
-                        dispatch(
-                            actions.track.updatePatternBeats({
-                                patternId,
-                                noteId,
-                                beats: changedBeats,
-                            }),
-                        );
-                    }, console.error);
+    //         for (const patternId of patternIds) {
+    //             const unsubscribe = (
+    //                 firestore.collection(
+    //                     `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/notes`,
+    //                 ) as CollectionReference<DocNote>
+    //             ).onSnapshot((noteCollection) => {
+    //                 const changedNotes = noteCollection
+    //                     .docChanges()
+    //                     .reduce<{ [noteId in NoteId]?: DocNote | null }>(
+    //                         (notes, noteDoc) => ({
+    //                             ...notes,
+    //                             [noteDoc.doc.id]:
+    //                                 noteDoc.newIndex === -1
+    //                                     ? null
+    //                                     : noteDoc.doc.data(),
+    //                         }),
+    //                         {},
+    //                     );
 
-                    unsubscribes.push(unsubscribe);
-                }
-            }
+    //                 dispatch(
+    //                     actions.track.updatePatternNotes({
+    //                         patternId,
+    //                         notes: changedNotes,
+    //                     }),
+    //                 );
+    //             }, console.error);
 
-            return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
-        }
-    }, [userEmail, selectedTrackId, patternIds, patternNoteIds]);
+    //             unsubscribes.push(unsubscribe);
+    //         }
+
+    //         return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+    //     }
+    // }, [userEmail, selectedTrackId, patternIds]);
+
+    // // Update BEATS for every note in every pattern
+    // useEffect(() => {
+    //     if (
+    //         userEmail &&
+    //         selectedTrackId !== undefined &&
+    //         patternIds.length > 0
+    //     ) {
+    //         const unsubscribes: (() => void)[] = [];
+
+    //         for (const patternId of patternIds) {
+    //             for (const noteId of patternNoteIds[patternId] || []) {
+    //                 const unsubscribe = (
+    //                     firestore.collection(
+    //                         `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/notes/${noteId}/beats`,
+    //                     ) as CollectionReference<DocBeat>
+    //                 ).onSnapshot((beatCollection) => {
+    //                     const changedBeats = beatCollection
+    //                         .docChanges()
+    //                         .reduce<Record<BeatId, DocBeat | null>>(
+    //                             (beats, beatDoc) => ({
+    //                                 ...beats,
+    //                                 [beatDoc.doc.id]:
+    //                                     beatDoc.newIndex === -1
+    //                                         ? null
+    //                                         : beatDoc.doc.data(),
+    //                             }),
+    //                             {},
+    //                         );
+
+    //                     dispatch(
+    //                         actions.track.updatePatternBeats({
+    //                             patternId,
+    //                             noteId,
+    //                             beats: changedBeats,
+    //                         }),
+    //                     );
+    //                 }, console.error);
+
+    //                 unsubscribes.push(unsubscribe);
+    //             }
+    //         }
+
+    //         return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+    //     }
+    // }, [userEmail, selectedTrackId, patternIds, patternNoteIds]);
 
     return null;
 }
