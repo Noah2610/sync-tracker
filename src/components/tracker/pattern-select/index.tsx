@@ -5,10 +5,15 @@ import { PatternId, Patterns } from "../../../store/types";
 import PatternList from "./pattern-list";
 import NewPatternButton from "./new-pattern-button";
 
-const selector = (state: State) => ({
-    patterns: state.track.patterns,
-    selectedPatternId: state.track.selectedPatternId,
-});
+const selector = (state: State) => {
+    const track =
+        state.track.selectedTrack &&
+        state.track.tracks[state.track.selectedTrack?.id];
+    return {
+        patterns: track?.patterns || {},
+        selectedPatternId: state.track.selectedTrack?.selectedPattern?.id,
+    };
+};
 
 type SelectorReturn = ReturnType<typeof selector>;
 

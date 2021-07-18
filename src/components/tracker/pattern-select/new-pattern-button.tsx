@@ -2,82 +2,76 @@ import { useCallback } from "react";
 import { Button } from "@material-ui/core";
 import { useSelector } from "../../../store";
 import useFirebaseDispatch from "../../../firebase/use-firebase-dispatch";
-import { DocNote } from "../../../firebase/types";
-import { NoteId } from "../../../store/types";
+import { DocCell, DocChannel, WithoutId } from "../../../firebase/types";
 
 export default function NewPatternButton() {
-    const selectedTrackId = useSelector((state) => state.track.selectedTrackId);
+    const selectedTrackId = useSelector(
+        (state) => state.track.selectedTrack?.id,
+    );
     const firebaseDispatch = useFirebaseDispatch();
 
     const newPattern = useCallback(() => {
-        if (selectedTrackId) {
+        if (selectedTrackId !== undefined) {
             firebaseDispatch
                 .newPattern({
                     trackId: selectedTrackId,
                     doc: {
                         name: "New Pattern",
                         order: 0,
-                        instrument: {
-                            name: "Synth",
-                            isPoly: true,
-                        },
                     },
                 })
                 .then((pattern) =>
                     Promise.all(
-                        (
-                            [
-                                {
-                                    id: "B2",
-                                    doc: {
-                                        order: 0,
-                                    },
-                                },
-                                {
-                                    id: "A2",
-                                    doc: {
-                                        order: 1,
-                                    },
-                                },
-                                {
-                                    id: "G2",
-                                    doc: {
-                                        order: 2,
-                                    },
-                                },
-                                {
-                                    id: "F2",
-                                    doc: {
-                                        order: 3,
-                                    },
-                                },
-                                {
-                                    id: "E2",
-                                    doc: {
-                                        order: 4,
-                                    },
-                                },
-                                {
-                                    id: "D2",
-                                    doc: {
-                                        order: 5,
-                                    },
-                                },
-                                {
-                                    id: "C2",
-                                    doc: {
-                                        order: 6,
-                                    },
-                                },
-                            ] as { id: NoteId; doc: DocNote }[]
-                        ).map(({ id, doc }) =>
-                            firebaseDispatch.setNote({
-                                id,
-                                doc,
-                                trackId: selectedTrackId,
-                                patternId: pattern.id,
-                            }),
-                        ),
+                        Array.from({ length: 5 })
+                            .map(
+                                (_, i) =>
+                                    ({
+                                        name: `Channel ${i}`,
+                                        instrument: {
+                                            name: "Synth",
+                                            isPoly: true,
+                                        },
+                                    } as WithoutId<DocChannel>),
+                            )
+                            .map((doc) =>
+                                firebaseDispatch
+                                    .newChannel({
+                                        doc,
+                                        trackId: selectedTrackId,
+                                        patternId: pattern.id,
+                                    })
+                                    .then((channel) =>
+                                        Promise.all(
+                                            [
+                                                "B2",
+                                                "A2",
+                                                "G2",
+                                                "F2",
+                                                "E2",
+                                                "D2",
+                                                "C2",
+                                            ]
+                                                .map(
+                                                    (note, i) =>
+                                                        ({
+                                                            type: "note",
+                                                            id: `0:${i}:0`,
+                                                            note,
+                                                        } as DocCell),
+                                                )
+                                                .map((doc) =>
+                                                    firebaseDispatch.setCell({
+                                                        doc,
+                                                        id: doc.id,
+                                                        trackId:
+                                                            selectedTrackId,
+                                                        patternId: pattern.id,
+                                                        channelId: channel.id,
+                                                    }),
+                                                ),
+                                        ),
+                                    ),
+                            ),
                     ),
                 );
         }
