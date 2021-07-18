@@ -8,11 +8,16 @@ import {
     DocTrack,
     DocChannel,
     DocCell,
+    WithoutId,
 } from "./types";
 import { TrackId, PatternId, ChannelId, CellId } from "../store/types";
 
 export interface FirebaseDispatch {
-    newTrack({ doc }: { doc: DocTrack }): Promise<DocumentReference<DocTrack>>;
+    newTrack({
+        doc,
+    }: {
+        doc: WithoutId<DocTrack>;
+    }): Promise<DocumentReference<WithoutId<DocTrack>>>;
 
     setTrack({ id, doc }: { id: TrackId; doc: DocTrack }): Promise<void>;
 
@@ -23,8 +28,8 @@ export interface FirebaseDispatch {
         doc,
     }: {
         trackId: TrackId;
-        doc: DocPattern;
-    }): Promise<DocumentReference<DocPattern>>;
+        doc: WithoutId<DocPattern>;
+    }): Promise<DocumentReference<WithoutId<DocPattern>>>;
 
     setPattern({
         id,
@@ -51,8 +56,8 @@ export interface FirebaseDispatch {
     }: {
         trackId: TrackId;
         patternId: PatternId;
-        doc: DocChannel;
-    }): Promise<DocumentReference<DocChannel>>;
+        doc: WithoutId<DocChannel>;
+    }): Promise<DocumentReference<WithoutId<DocChannel>>>;
 
     setChannel({
         id,
@@ -75,18 +80,6 @@ export interface FirebaseDispatch {
         trackId: TrackId;
         patternId: PatternId;
     }): Promise<void>;
-
-    newCell({
-        trackId,
-        patternId,
-        channelId,
-        doc,
-    }: {
-        trackId: TrackId;
-        patternId: PatternId;
-        channelId: ChannelId;
-        doc: DocCell;
-    }): Promise<DocumentReference<DocCell>>;
 
     setCell({
         id,
@@ -131,7 +124,6 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                 newChannel: reject,
                 setChannel: reject,
                 deleteChannel: reject,
-                newCell: reject,
                 setCell: reject,
                 deleteCell: reject,
             };
@@ -143,7 +135,7 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                 return (
                     firestore.collection(
                         `${baseRef}/tracks`,
-                    ) as CollectionReference<DocTrack>
+                    ) as CollectionReference<WithoutId<DocTrack>>
                 ).add(doc);
             },
 
@@ -163,7 +155,7 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                 return (
                     firestore.collection(
                         `${baseRef}/tracks/${trackId}/patterns`,
-                    ) as CollectionReference<DocPattern>
+                    ) as CollectionReference<WithoutId<DocPattern>>
                 ).add(doc);
             },
 
@@ -185,7 +177,7 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                 return (
                     firestore.collection(
                         `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels`,
-                    ) as CollectionReference<DocChannel>
+                    ) as CollectionReference<WithoutId<DocChannel>>
                 ).add(doc);
             },
 
@@ -203,14 +195,6 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                         `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels/${id}`,
                     )
                     .delete();
-            },
-
-            newCell({ trackId, patternId, channelId, doc }) {
-                return (
-                    firestore.collection(
-                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels/${channelId}/cells`,
-                    ) as CollectionReference<DocCell>
-                ).add(doc);
             },
 
             setCell({ id, trackId, patternId, channelId, doc }) {

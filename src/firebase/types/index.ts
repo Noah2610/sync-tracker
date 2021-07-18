@@ -7,12 +7,13 @@ import {
     Channel,
     ChannelId,
     Cell,
-    CellId,
 } from "../../store/types";
 
 export type CollectionReference<T> = firebase.firestore.CollectionReference<T>;
 export type DocumentReference<T> = firebase.firestore.DocumentReference<T>;
 export type DocumentSnapshot<T> = firebase.firestore.DocumentSnapshot<T>;
+
+export type WithoutId<T> = Omit<T, "id">;
 
 export interface DocUser {}
 
