@@ -4,12 +4,12 @@ import { auth, firestore } from ".";
 import {
     CollectionReference,
     DocumentReference,
-    DocBeat,
-    DocNote,
     DocPattern,
     DocTrack,
+    DocChannel,
+    DocCell,
 } from "./types";
-import { TrackId, PatternId, NoteId, BeatId } from "../store/types";
+import { TrackId, PatternId, ChannelId, CellId } from "../store/types";
 
 export interface FirebaseDispatch {
     newTrack({ doc }: { doc: DocTrack }): Promise<DocumentReference<DocTrack>>;
@@ -44,30 +44,74 @@ export interface FirebaseDispatch {
         trackId: TrackId;
     }): Promise<void>;
 
-    setNote({
+    newChannel({
+        trackId,
+        patternId,
+        doc,
+    }: {
+        trackId: TrackId;
+        patternId: PatternId;
+        doc: DocChannel;
+    }): Promise<DocumentReference<DocChannel>>;
+
+    setChannel({
         id,
         trackId,
         patternId,
         doc,
     }: {
-        id: NoteId;
+        id: ChannelId;
         trackId: TrackId;
         patternId: PatternId;
-        doc: DocNote;
+        doc: DocChannel;
     }): Promise<void>;
 
-    setBeat({
+    deleteChannel({
         id,
         trackId,
         patternId,
-        noteId,
-        doc,
     }: {
-        id: BeatId;
+        id: ChannelId;
         trackId: TrackId;
         patternId: PatternId;
-        noteId: NoteId;
-        doc: DocBeat;
+    }): Promise<void>;
+
+    newCell({
+        trackId,
+        patternId,
+        channelId,
+        doc,
+    }: {
+        trackId: TrackId;
+        patternId: PatternId;
+        channelId: ChannelId;
+        doc: DocCell;
+    }): Promise<DocumentReference<DocCell>>;
+
+    setCell({
+        id,
+        trackId,
+        patternId,
+        channelId,
+        doc,
+    }: {
+        id: CellId;
+        trackId: TrackId;
+        patternId: PatternId;
+        channelId: ChannelId;
+        doc: DocCell;
+    }): Promise<void>;
+
+    deleteCell({
+        id,
+        trackId,
+        patternId,
+        channelId,
+    }: {
+        id: CellId;
+        trackId: TrackId;
+        patternId: PatternId;
+        channelId: ChannelId;
     }): Promise<void>;
 }
 
@@ -84,8 +128,12 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                 newPattern: reject,
                 setPattern: reject,
                 deletePattern: reject,
-                setNote: reject,
-                setBeat: reject,
+                newChannel: reject,
+                setChannel: reject,
+                deleteChannel: reject,
+                newCell: reject,
+                setCell: reject,
+                deleteCell: reject,
             };
         }
 
@@ -133,20 +181,52 @@ export default function useFirebaseDispatch(): FirebaseDispatch {
                     .delete();
             },
 
-            setNote({ id, trackId, patternId, doc }) {
+            newChannel({ trackId, patternId, doc }) {
+                return (
+                    firestore.collection(
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels`,
+                    ) as CollectionReference<DocChannel>
+                ).add(doc);
+            },
+
+            setChannel({ id, trackId, patternId, doc }) {
                 return (
                     firestore.doc(
-                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/notes/${id}`,
-                    ) as DocumentReference<DocNote>
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels/${id}`,
+                    ) as DocumentReference<DocChannel>
                 ).set(doc);
             },
 
-            setBeat({ id, trackId, patternId, noteId, doc }) {
+            deleteChannel({ id, trackId, patternId }) {
+                return firestore
+                    .doc(
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels/${id}`,
+                    )
+                    .delete();
+            },
+
+            newCell({ trackId, patternId, channelId, doc }) {
+                return (
+                    firestore.collection(
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels/${channelId}/cells`,
+                    ) as CollectionReference<DocCell>
+                ).add(doc);
+            },
+
+            setCell({ id, trackId, patternId, channelId, doc }) {
                 return (
                     firestore.doc(
-                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/notes/${noteId}/beats/${id}`,
-                    ) as DocumentReference<DocBeat>
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels/${channelId}/cells/${id}`,
+                    ) as DocumentReference<DocCell>
                 ).set(doc);
+            },
+
+            deleteCell({ id, trackId, patternId, channelId }) {
+                return firestore
+                    .doc(
+                        `${baseRef}/tracks/${trackId}/patterns/${patternId}/channels/${channelId}/cells/${id}`,
+                    )
+                    .delete();
             },
         };
     }, [userEmail]);
