@@ -6,6 +6,7 @@ export type ChannelId = string;
 export type Channels = Record<ChannelId, Channel>;
 
 export interface Channel {
+    id: ChannelId;
     name: string;
     instrument: Instrument;
     cells: Cells;

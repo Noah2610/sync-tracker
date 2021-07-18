@@ -7,26 +7,19 @@ export type CellPosBar = number;
 export type CellPosQuarter = number;
 export type CellPosSixteenth = number;
 
-export type Cells = Record<CellPos, CellGroup>;
+export type CellId = CellPos;
 
-export type CellGroup = Cell[];
+// export type Cells = Record<CellId, Cell>;
+export type Cells = Record<string, Cell>;
 
-export type Cell = CellAttack | CellRelease | CellEffect | CellCommand;
+export type Cell = { id: CellId } & (CellNote | CellCommand);
 
-export interface CellAttack {
-    type: "attack";
+export type CellPart = CellNote | Effect | CellCommand;
+
+export interface CellNote {
+    type: "note";
     note: LibNote;
-    attack?: NoteAttack;
-}
-
-export interface CellRelease {
-    type: "release";
-    release?: NoteRelease;
-}
-
-export interface CellEffect {
-    type: "effect";
-    effect: Effect;
+    effects?: Record<EffectType, Effect>;
 }
 
 export interface CellCommand {
@@ -34,28 +27,25 @@ export interface CellCommand {
     command: "cut" | "skip";
 }
 
-export type NoteAttack = number;
-export type NoteRelease = number;
+export type EffectType = Effect["type"];
 
 export type Effect =
     | {
           type: "volume";
-          payload: {
-              volume: number;
-          } | null;
+          volume: number;
       }
     | {
           type: "volumeSlide";
-          payload: {
-              slide: ["up" | "down", number];
-          } | null;
+          slide: ["up" | "down", number];
       }
     | {
           type: "vibrato";
-          payload: {
-              speed: number;
-              depth: number;
-          } | null;
+          speed: number;
+          depth: number;
+      }
+    | {
+          type: "effectReset";
+          effectType: Omit<EffectType, "effectReset">;
       };
 
 export function splitCellPos(

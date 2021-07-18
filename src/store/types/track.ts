@@ -4,6 +4,7 @@ import { Patterns } from "./pattern";
 export type Tracks = Record<TrackId, Track>;
 
 export interface Track {
+    id: TrackId;
     name: string;
     config: LibTrack["config"];
     patterns: Patterns;

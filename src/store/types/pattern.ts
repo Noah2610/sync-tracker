@@ -7,9 +7,10 @@ export type PatternId = string;
 export type Patterns = Record<PatternId, Pattern>;
 
 export interface Pattern {
+    id: PatternId;
     name: LibPattern["name"];
     channels: Channels;
-    // order: number;
+    order: number;
     // notes: Notes;
     // instrument: Instrument;
 }
