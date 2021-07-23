@@ -1,11 +1,8 @@
-import Tracker from "../components/tracker";
-import Playground from "../components/playground";
+import Tracker from "../components/simple-tracker";
 
 export default function Home() {
     return (
         <>
-            <Playground />
-
             <Tracker />
         </>
     );
