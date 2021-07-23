@@ -1,7 +1,7 @@
 import { shallowEqual } from "react-redux";
 import safeObjectKeys from "../util/safeObjectKeys";
 import { useSelector } from "../store";
-import { Notes, Pattern, PatternId } from "../store/types";
+import { Pattern, PatternId } from "../store/types";
 
 const arePatternsEqual = (
     a: Pattern | undefined,
@@ -24,7 +24,10 @@ export default function usePattern(
         (state) =>
             patternId === undefined
                 ? undefined
-                : state.track.patterns[patternId],
+                : state.track.selectedTrack &&
+                  state.track.tracks[state.track.selectedTrack.id]?.patterns[
+                      patternId
+                  ],
         arePatternsEqual,
     );
 }

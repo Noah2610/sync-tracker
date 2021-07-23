@@ -5,14 +5,27 @@ import BeatDisplay from "./beat-display";
 import PatternSelect from "../tracker/pattern-select";
 
 export default function SimpleTracker() {
+    return (
+        <Box>
+            <Box>
+                <PatternSelect />
+            </Box>
+            <Box>
+                <SimpleTrackerGrid />
+            </Box>
+        </Box>
+    );
+}
+
+function SimpleTrackerGrid() {
     const [trackId, track] = useSelectedTrack();
     const [patternId, pattern] = useSelectedPattern();
 
     if (
         trackId === undefined ||
-        track === undefined // ||
-        // patternId === undefined ||
-        // pattern === undefined
+        track === undefined ||
+        patternId === undefined ||
+        pattern === undefined
     ) {
         return null;
     }
@@ -21,16 +34,15 @@ export default function SimpleTracker() {
 
     // const channels = pattern.channels;
 
+    console.log(track, pattern);
+
     return (
-        <Box>
-            <PatternSelect />
-            <Box>
-                {Array.from({ length: patternLen }).map((_, beat) => (
-                    <>
-                        <BeatDisplay beat={beat} />
-                    </>
-                ))}
-            </Box>
-        </Box>
+        <>
+            {Array.from({ length: patternLen }).map((_, beat) => (
+                <Box key={beat}>
+                    <BeatDisplay beat={beat} />
+                </Box>
+            ))}
+        </>
     );
 }

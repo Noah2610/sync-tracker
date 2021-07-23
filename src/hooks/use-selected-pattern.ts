@@ -3,7 +3,9 @@ import { Pattern, PatternId } from "../store/types";
 import usePattern from "./use-pattern";
 
 export default function useSelectedPattern(): [PatternId, Pattern] | [] {
-    const patternId = useSelector((state) => state.track.selectedPatternId);
+    const patternId = useSelector(
+        (state) => state.track.selectedTrack?.selectedPattern?.id,
+    );
     const pattern = usePattern(patternId);
 
     if (patternId === undefined || pattern === undefined) {
