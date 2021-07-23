@@ -35,10 +35,10 @@ export default function NoteCell({
             }
         }
     }, [note, instrument]);
-    const stopNote = useCallback(() => instrument?.triggerRelease(0), [
-        note,
-        instrument,
-    ]);
+    const stopNote = useCallback(
+        () => instrument?.triggerRelease(0),
+        [note, instrument],
+    );
 
     return (
         <NoteTableCell
