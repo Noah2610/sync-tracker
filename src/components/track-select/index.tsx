@@ -28,7 +28,7 @@ export default function TrackSelect() {
     const dispatch = useDispatch();
     const { selectedTrackId, tracks } = useSelector(
         (state) => ({
-            selectedTrackId: state.track.selectedTrackId,
+            selectedTrackId: state.track.selectedTrack?.id,
             tracks: state.track.tracks,
         }),
         (a, b) =>

@@ -48,6 +48,14 @@ export default function SyncFirebaseToStore() {
         );
     }, shallowEqual);
 
+    const patternIdsSer =
+        patternAndChannelIds && Object.keys(patternAndChannelIds).join(",");
+    const channelIdsSer =
+        patternAndChannelIds &&
+        Object.values(patternAndChannelIds)
+            .map((cIds) => cIds.join(","))
+            .join(",");
+
     // const patternNoteIds = useSelector(
     //     (state) =>
     //         Object.keys(state.track.patterns).reduce<
@@ -106,24 +114,24 @@ export default function SyncFirebaseToStore() {
         const unsubs: (() => void)[] = [];
 
         // Update TRACK
-        unsubs.push(
-            (firestore.doc(trackRef) as DocumentReference<DocTrack>).onSnapshot(
-                (trackSnapshot) => {
-                    const trackDoc = trackSnapshot.data();
-                    if (trackDoc) {
-                        dispatch(
-                            actions.track.setStateTracks([
-                                {
-                                    ...{ id: trackSnapshot.id },
-                                    ...trackDoc,
-                                },
-                            ]),
-                        );
-                    }
-                },
-                console.error,
-            ),
-        );
+        // unsubs.push(
+        //     (firestore.doc(trackRef) as DocumentReference<DocTrack>).onSnapshot(
+        //         (trackSnapshot) => {
+        //             const trackDoc = trackSnapshot.data();
+        //             if (trackDoc) {
+        //                 dispatch(
+        //                     actions.track.setStateTracks([
+        //                         {
+        //                             ...{ id: trackSnapshot.id },
+        //                             ...trackDoc,
+        //                         },
+        //                     ]),
+        //                 );
+        //             }
+        //         },
+        //         console.error,
+        //     ),
+        // );
 
         // Update PATTERNS
         const patternsRef = `${trackRef}/patterns`;
@@ -160,11 +168,10 @@ export default function SyncFirebaseToStore() {
             return;
         }
 
-        const channelsRef = `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${selectedPatternId}/channels`;
-
         const unsubs = createUnsubs();
 
         for (const patternId of safeObjectKeys(patternAndChannelIds)) {
+            const channelsRef = `/users/${userEmail}/tracks/${selectedTrackId}/patterns/${patternId}/channels`;
             unsubs.add(
                 (
                     firestore.collection(
@@ -189,7 +196,7 @@ export default function SyncFirebaseToStore() {
         }
 
         return unsubs.unsubAll;
-    }, [userEmail, selectedTrackId, patternAndChannelIds]);
+    }, [userEmail, selectedTrackId, patternIdsSer]);
 
     // Update CELLS from selectedTrackId and channel IDs
     useEffect(() => {
@@ -229,7 +236,7 @@ export default function SyncFirebaseToStore() {
         }
 
         return unsubs.unsubAll;
-    }, [userEmail, selectedTrackId, patternAndChannelIds]);
+    }, [userEmail, selectedTrackId, patternIdsSer, channelIdsSer]);
 
     // Update NOTES for every pattern
     // useEffect(() => {
